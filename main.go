@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/School-meal-lover/backend/docs"
+	_ "github.com/School-meal-lover/backend/docs"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -25,7 +25,6 @@ func main() {
 	router.GET("/hello", Helloworld)
 
 	// Set up Swagger
-	docs.SwaggerInfo.Title = "Grrrrr API"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Run the server
