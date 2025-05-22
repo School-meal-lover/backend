@@ -1,0 +1,3 @@
+Table meal{
+    id string [uuid, pk, unique]
+}
