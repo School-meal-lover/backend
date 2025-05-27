@@ -1,3 +1,37 @@
-Table meal{
-    id string [uuid, pk, unique]
+//dbdocs build database.dbml --project grrr_db --output docs
+Project grrr_db{
+  type: "PostgreSQL"
+}
+Table restaurants{  
+  id string [uuid, pk, unique]
+  name string [not null]
+  name_en string
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+Table weeks{
+  id string [uuid, pk, unique]
+  start_date date [not null]
+  restaurants_id string [ref: > restaurants.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+Table meals{
+  id string [uuid, pk, unique]
+  name string
+  name_en string
+  weeksid string [ref: > weeks.id]
+  date date 
+  day_of_week string [not null, note: 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday']
+  meal_type string [not null, note: 'Breakfast, Lunch_1, Lunch_2, Dinner']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+Table menu_items{
+  id string [uuid, pk, unique]
+  meals_id string [ref: > meals.id]
+  category string [not null, note: '밥, 국, 메인메뉴, 반찬']
+  name string
+  name_en string
+  price decimal (10, 2)
 }
