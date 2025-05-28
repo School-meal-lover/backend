@@ -1,37 +1,42 @@
-//dbdocs build database.dbml --project grrr_db --output docs
-Project grrr_db{
-  type: "PostgreSQL"
+Project grrr_db {
+  database_type: "PostgreSQL"
 }
-Table restaurants{  
-  id string [pk, unique]
-  name string [not null]
-  name_en string
+
+Table restaurants {
+  id uuid [pk, unique, default: `gen_random_uuid()`]
+  name varchar [not null]
+  name_en varchar
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
-Table weeks{
-  id string [pk, unique]
+
+Table weeks {
+  id uuid [pk, unique, default: `gen_random_uuid()`]
   start_date date [not null]
-  restaurants_id string [ref: > restaurants.id]
+  restaurants_id uuid [ref: > restaurants.id]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
-Table meals{
-  id string [pk, unique]
-  name string
-  name_en string
-  weeksid string [ref: > weeks.id]
-  date date 
-  day_of_week string [not null, note: 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday']
-  meal_type string [not null, note: 'Breakfast, Lunch_1, Lunch_2, Dinner']
+
+Table meals {
+  id uuid [pk, unique, default: `gen_random_uuid()`]
+  name varchar
+  name_en varchar
+  weeks_id uuid [ref: > weeks.id]
+  date date
+  day_of_week varchar [not null, note: 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday']
+  meal_type varchar [not null, note: 'Breakfast, Lunch_1, Lunch_2, Dinner']
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
-Table menu_items{
-  id string [pk, unique]
-  meals_id string [ref: > meals.id]
-  category string [not null, note: '밥, 국, 메인메뉴, 반찬']
-  name string
-  name_en string
-  price decimal (10, 2)
+
+Table menu_items {
+  id uuid [pk, unique, default: `gen_random_uuid()`]
+  meals_id uuid [ref: > meals.id]
+  category varchar [not null, note: '밥, 국, 메인메뉴, 반찬']
+  name varchar
+  name_en varchar
+  price decimal(10,2)
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
 }
