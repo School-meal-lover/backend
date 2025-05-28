@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -22,10 +23,16 @@ func ConnectDatabase() {
 	dbname := os.Getenv("DB_NAME")
 
 	// connect to the database
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", host, port, user, password, dbname)
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Failed to connect to the database: %v", err)
+	}
+	fmt.Println("Connected to the database successfully")
 	Db = db
+
 }

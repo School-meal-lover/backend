@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	database "github.com/School-meal-lover/backend/database"
 	_ "github.com/School-meal-lover/backend/docs"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -23,7 +24,7 @@ func main() {
 		})
 	})
 	router.GET("/hello", Helloworld)
-
+	database.ConnectDatabase()
 	// Set up Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
