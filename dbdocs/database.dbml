@@ -3,21 +3,21 @@ Project grrr_db{
   type: "PostgreSQL"
 }
 Table restaurants{  
-  id string [uuid, pk, unique]
+  id string [pk, unique]
   name string [not null]
   name_en string
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
 Table weeks{
-  id string [uuid, pk, unique]
+  id string [pk, unique]
   start_date date [not null]
   restaurants_id string [ref: > restaurants.id]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
 Table meals{
-  id string [uuid, pk, unique]
+  id string [pk, unique]
   name string
   name_en string
   weeksid string [ref: > weeks.id]
@@ -28,7 +28,7 @@ Table meals{
   updated_at timestamp [default: `now()`]
 }
 Table menu_items{
-  id string [uuid, pk, unique]
+  id string [pk, unique]
   meals_id string [ref: > meals.id]
   category string [not null, note: '밥, 국, 메인메뉴, 반찬']
   name string
