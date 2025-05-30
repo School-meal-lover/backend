@@ -1,6 +1,6 @@
 CREATE TABLE "restaurants" (
   "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid ()),
-  "name" varchar NOT NULL,
+  "name" varchar NOT NULL UNIQUE,
   "name_en" varchar,
   "created_at" timestamp DEFAULT (now ()),
   "updated_at" timestamp DEFAULT (now ())
