@@ -35,11 +35,11 @@ func main() {
 	mealRepo := repository.NewMealRepository(db)
 	
 	// 서비스 초기화
-	// mealService := services.NewMealService(mealRepo)
+	mealService := services.NewMealService(mealRepo)
 	excelService := services.NewExcelService(mealRepo)
 	
 	// 핸들러 초기화
-	// mealHandler := handlers.NewMealHandler(mealService)
+	mealHandler := handlers.NewMealHandler(mealService)
 	excelHandler := handlers.NewExcelHandler(excelService)
 
 	// CORS 미들웨어
@@ -60,9 +60,7 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 			// 기존 식단 조회 API
-			// api.GET("/cafeterias", mealHandler.GetCafeterias)
-			// api.GET("/cafeteria/:id/menu", mealHandler.GetCafeteriaMenu)
-			// api.GET("/cafeteria/:id/meals", mealHandler.GetCafeteriaMeals)
+			api.GET("/restaurants/:id", mealHandler.GetRestaurantMeals)
 			
 			// // 엑셀 처리 API
 			// api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
