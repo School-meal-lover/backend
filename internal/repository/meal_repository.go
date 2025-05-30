@@ -122,7 +122,7 @@ func (r *MealRepository) GetMealCountByWeekID(weekID string) (int, error) {
 // 식사별 메뉴 아이템 개수 조회
 func (r *MealRepository) GetMenuItemCountByWeekID(weekID string) (int, error) {
     query := `
-        SELECT COUNT(mi.*) 
+        SELECT COUNT(*) 
         FROM menu_items mi 
         INNER JOIN meals m ON mi.meals_id = m.id 
         WHERE m.weeks_id = $1`
