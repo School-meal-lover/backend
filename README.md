@@ -30,3 +30,9 @@ curl -X POST http://localhost:8080/api/v1/process/excel/local \
 curl -X POST http://localhost:8080/api/v1/upload/excel \
   -F "excel=@asssets/2025_5_5_ko.xlsx"
 ```
+
+## how to build swagger file
+
+```bash
+swag init -d ./cmd
+```
