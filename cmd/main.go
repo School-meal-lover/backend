@@ -8,6 +8,7 @@ import (
 	"github.com/School-meal-lover/backend/internal/repository"
 	"github.com/School-meal-lover/backend/internal/services"
 
+	_ "github.com/School-meal-lover/backend/docs" // Swagger 문서
 	gin "github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -39,6 +40,7 @@ func main() {
 	excelService := services.NewExcelService(mealRepo)
 	
 	// 핸들러 초기화
+//@Description 기존 식단 조회 API
 	mealHandler := handlers.NewMealHandler(mealService)
 	excelHandler := handlers.NewExcelHandler(excelService)
 
@@ -55,14 +57,13 @@ func main() {
 			
 			c.Next()
 	})
-
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
 			// 기존 식단 조회 API
 			api.GET("/restaurants/:id", mealHandler.GetRestaurantMeals)
 			
-			// // 엑셀 처리 API
+			//@Description 엑셀 처리 API
 			// api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
 			api.POST("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
 	}
@@ -72,7 +73,7 @@ func main() {
 	// Run the server
 	router.Run(":8080")
 	if err := router.Run(":8080"); err != nil {
-		panic(err)
+	panic(err)
 	}
 }
 
@@ -86,3 +87,5 @@ func main() {
 func Helloworld(g *gin.Context) {
 	g.JSON(http.StatusOK, "hello world")
 }
+
+
