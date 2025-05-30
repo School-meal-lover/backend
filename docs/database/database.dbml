@@ -20,8 +20,6 @@ Table weeks {
 
 Table meals {
   id uuid [pk, unique, default: `gen_random_uuid()`]
-  name varchar
-  name_en varchar
   weeks_id uuid [ref: > weeks.id]
   date date
   day_of_week varchar [not null, note: 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday']
