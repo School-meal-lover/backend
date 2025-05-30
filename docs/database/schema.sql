@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml.dbdiagram.io)
 -- Database: PostgreSQL
--- Generated at: 2025-05-28T09:34:18.278Z
+-- Generated at: 2025-05-29T05:06:37.986Z
 
 CREATE TABLE "restaurants" (
   "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
@@ -20,8 +20,6 @@ CREATE TABLE "weeks" (
 
 CREATE TABLE "meals" (
   "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "name" varchar,
-  "name_en" varchar,
   "weeks_id" uuid,
   "date" date,
   "day_of_week" varchar NOT NULL,
