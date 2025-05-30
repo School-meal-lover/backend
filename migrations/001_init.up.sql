@@ -1,42 +1,38 @@
--- SQL dump generated using DBML (dbml.dbdiagram.io)
--- Database: PostgreSQL
--- Generated at: 2025-05-29T05:06:37.986Z
-
 CREATE TABLE "restaurants" (
-  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid ()),
   "name" varchar NOT NULL,
   "name_en" varchar,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
+  "created_at" timestamp DEFAULT (now ()),
+  "updated_at" timestamp DEFAULT (now ())
 );
 
 CREATE TABLE "weeks" (
-  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid ()),
   "start_date" date NOT NULL,
   "restaurants_id" uuid,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
+  "created_at" timestamp DEFAULT (now ()),
+  "updated_at" timestamp DEFAULT (now ())
 );
 
 CREATE TABLE "meals" (
-  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid ()),
   "weeks_id" uuid,
   "date" date,
   "day_of_week" varchar NOT NULL,
   "meal_type" varchar NOT NULL,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
+  "created_at" timestamp DEFAULT (now ()),
+  "updated_at" timestamp DEFAULT (now ())
 );
 
 CREATE TABLE "menu_items" (
-  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "id" uuid UNIQUE PRIMARY KEY DEFAULT (gen_random_uuid ()),
   "meals_id" uuid,
   "category" varchar NOT NULL,
   "name" varchar,
   "name_en" varchar,
-  "price" decimal(10,2),
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
+  "price" decimal(10, 2),
+  "created_at" timestamp DEFAULT (now ()),
+  "updated_at" timestamp DEFAULT (now ())
 );
 
 COMMENT ON COLUMN "meals"."day_of_week" IS 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday';
