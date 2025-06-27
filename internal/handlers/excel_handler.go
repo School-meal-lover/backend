@@ -41,7 +41,8 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
         return
     }
     
-    // 파일 저장
+    // 파일 저장 
+		// TODO: 버킷에 저장하는 것으로 변경 필요
     filename := "uploads/" + file.Filename
     if err := c.SaveUploadedFile(file, filename); err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
