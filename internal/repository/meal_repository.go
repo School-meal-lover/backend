@@ -84,9 +84,14 @@ func (r *MealRepository) InsertMenuItems(menuItems []models.MenuItem) error {
     }
     defer tx.Rollback()
     
-    stmt, err := tx.Prepare(`
-        INSERT INTO menu_items (id, meals_id, category, name, name_en, price, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, now(), now())`)
+		stmt, err := tx.Prepare(`
+				INSERT INTO menu_items (id, meals_id, category, name, name_en, price, created_at, updated_at)
+				VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+				ON CONFLICT (meals_id, category, name) DO UPDATE SET
+					name_en = EXCLUDED.name_en,
+					price = EXCLUDED.price,
+					updated_at = NOW();
+			`)
     if err != nil {
         return fmt.Errorf("failed to prepare statement: %w", err)
     }
@@ -107,34 +112,34 @@ func (r *MealRepository) InsertMenuItems(menuItems []models.MenuItem) error {
 }
 
 // 주차별 식사 개수 조회
-func (r *MealRepository) GetMealCountByWeekID(weekID string) (int, error) {
-    query := `SELECT COUNT(*) FROM meals WHERE weeks_id = $1`
+// func (r *MealRepository) GetMealCountByWeekID(weekID string) (int, error) {
+//     query := `SELECT COUNT(*) FROM meals WHERE weeks_id = $1`
     
-    var count int
-    err := r.db.QueryRow(query, weekID).Scan(&count)
-    if err != nil {
-        return 0, fmt.Errorf("failed to get meal count: %w", err)
-    }
+//     var count int
+//     err := r.db.QueryRow(query, weekID).Scan(&count)
+//     if err != nil {
+//         return 0, fmt.Errorf("failed to get meal count: %w", err)
+//     }
     
-    return count, nil
-}
+//     return count, nil
+// }
 
 // 식사별 메뉴 아이템 개수 조회
-func (r *MealRepository) GetMenuItemCountByWeekID(weekID string) (int, error) {
-    query := `
-        SELECT COUNT(*) 
-        FROM menu_items mi 
-        INNER JOIN meals m ON mi.meals_id = m.id 
-        WHERE m.weeks_id = $1`
+// func (r *MealRepository) GetMenuItemCountByWeekID(weekID string) (int, error) {
+//     query := `
+//         SELECT COUNT(*) 
+//         FROM menu_items mi 
+//         INNER JOIN meals m ON mi.meals_id = m.id 
+//         WHERE m.weeks_id = $1`
     
-    var count int
-    err := r.db.QueryRow(query, weekID).Scan(&count)
-    if err != nil {
-        return 0, fmt.Errorf("failed to get menu item count: %w", err)
-    }
+//     var count int
+//     err := r.db.QueryRow(query, weekID).Scan(&count)
+//     if err != nil {
+//         return 0, fmt.Errorf("failed to get menu item count: %w", err)
+//     }
     
-    return count, nil
-}
+//     return count, nil
+// }
 
 func (r *MealRepository) GetRestaurantWeekMeals(restaurantID string, date string) (*models.RestaurantMealsData, error) {
 	// 레스토랑 정보 조회

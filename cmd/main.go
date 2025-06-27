@@ -56,7 +56,7 @@ func main() {
 
 		//@Description 엑셀 처리 API
 		// api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
-		api.POST("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
+		api.GET("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
 	}
 	// Set up Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

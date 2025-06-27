@@ -55,7 +55,7 @@ func (p *Parser) ReadWeekStartDate(f *ExcelFile) (time.Time, error) {
     
     cell = strings.TrimSpace(cell)
     if cell == "" {
-        return time.Time{}, fmt.Errorf("cell D6 (week start date) is empty")
+        return time.Time{}, fmt.Errorf("cell D6 (week start date) i s empty")
     }
     
     // 엑셀 날짜 형태: "Mon 5/26"
@@ -64,8 +64,18 @@ func (p *Parser) ReadWeekStartDate(f *ExcelFile) (time.Time, error) {
         return time.Time{}, fmt.Errorf("invalid date format in cell D6: %s, expected 'Day MM/DD'", cell)
     }
     
-    fullDate := fmt.Sprintf("2025 %s", parts[1])
-    parsedDate, err := time.Parse("2006 1/2", fullDate)
+		dateParts := strings.SplitN(parts[1], "/", 2)
+		month, err := strconv.Atoi(dateParts[0])
+    if err != nil {
+        return time.Time{}, fmt.Errorf("failed to parse month '%s' from cell D6: %w", dateParts[0], err)
+    }
+    day, err := strconv.Atoi(dateParts[1])
+    if err != nil {
+        return time.Time{}, fmt.Errorf("failed to parse day '%s' from cell D6: %w", dateParts[1], err)
+    }
+		fullDate := fmt.Sprintf("2025-%02d-%02d", month, day)
+
+    parsedDate, err := time.Parse("2006-01-02", fullDate)
     if err != nil {
         return time.Time{}, fmt.Errorf("failed to parse date %s: %w", fullDate, err)
     }
@@ -119,7 +129,7 @@ func (p *Parser) BuildDatesFromExcel(f *ExcelFile) ([]models.DateInfo, error) {
         dates = append(dates, models.DateInfo{
             Date:      date.Format("2006-01-02"),
             DayOfWeek: parts[0],
-            Col:       col,
+						Col:       col,
         })
     }
     

@@ -34,7 +34,7 @@ func (s *ExcelService) ProcessExcelFile(filePath string) (*models.ExcelProcessRe
     }
     defer f.Close()
     
-    // 2. 레스토랑 정보 읽기
+    // 2. 레스토랑 정보 읽기 
     restaurantName, err := s.parser.ReadRestaurantName(f)
     if err != nil {
         return nil, fmt.Errorf("failed to read restaurant name: %w", err)
@@ -45,7 +45,8 @@ func (s *ExcelService) ProcessExcelFile(filePath string) (*models.ExcelProcessRe
         return nil, fmt.Errorf("failed to get restaurant: %w", err)
     }
     
-    // 3. 주차 정보 생성
+    // 3. 주차 정보 생성 
+		//weekStartDate 형식: "2006-01-02"
     weekStartDate, err := s.parser.ReadWeekStartDate(f)
     if err != nil {
         return nil, fmt.Errorf("failed to read week start date: %w", err)
@@ -114,12 +115,11 @@ func (s *ExcelService) processMealsAndMenus(f *excel.ExcelFile, weekID string, d
                 totalMenuItems += len(menuItems)
             }
         }
-    }
-    
+    } 
     return totalMeals, totalMenuItems, nil
 }
 
-// 식사 객체 생성 (비즈니스 로직)
+// 식사 객체 생성 아침/점심/점심/저녁
 func (s *ExcelService) buildMealFromDateInfo(weekID string, dateInfo models.DateInfo, mealType string) *models.Meal {
     date, err := time.Parse("2006-01-02", dateInfo.Date)
     if err != nil {
@@ -135,39 +135,42 @@ func (s *ExcelService) buildMealFromDateInfo(weekID string, dateInfo models.Date
     }
 }
 
-// 메뉴 아이템 생성 (비즈니스 로직)
+// 메뉴 아이템 생성 
 func (s *ExcelService) buildMenuItems(mealID string, itemNames []string, mealType string) []models.MenuItem {
     categories := s.getCategoriesForMealType(mealType)
     var menuItems []models.MenuItem
     
+		if len(itemNames) == 0 {
+				log.Printf("No menu items found for meal type %s", mealType)
+				return menuItems
+		}
+
     for idx, name := range itemNames {
-        categoryIdx := idx
-        if mealType == "Lunch_1" {
-            categoryIdx = 0 // 일품 메뉴는 메인메뉴 한개
-        }
-        if categoryIdx >= len(categories) {
-            categoryIdx = len(categories) - 1
-        }
-        
+				var category string
+
+				if idx < len(categories) {
+						category = categories[idx]
+				} else {
+						category = "기타" // 기본 카테고리
+				}
         menuItems = append(menuItems, models.MenuItem{
             MealID:   mealID,
-            Category: categories[categoryIdx],
+            Category: category,
             Name:     strings.TrimSpace(name),
             NameEn:   "",
             Price:    0.00,
         })
     }
-    
     return menuItems
 }
 
 // 식사 타입별 설정 반환
 func (s *ExcelService) getMealTypeConfigs() []models.MealTypeConfig {
     return []models.MealTypeConfig{
-        {"Breakfast", 10, 18},
-        {"Lunch_1", 20, 20},
-        {"Lunch_2", 22, 27},
-        {"Dinner", 29, 34},
+        {"Breakfast", 7, 16},
+        {"Lunch_1", 18, 18},
+        {"Lunch_2", 21, 26},
+        {"Dinner", 27, 32},
     }
 }
 
@@ -176,5 +179,8 @@ func (s *ExcelService) getCategoriesForMealType(mealType string) []string {
     if mealType == "Lunch_1" {
         return []string{"메인메뉴"} // 일품 메뉴
     }
-    return []string{"밥", "국", "메인메뉴", "반찬", "반찬", "반찬"}
+		if mealType == "Breakfast" {
+				return []string{"밥", "국", "반찬", "메인메뉴", "반찬", "반찬", "반찬", "반찬", "반찬"}
+		}
+    return []string{"밥", "국", "메인메뉴", "메인메뉴", "반찬", "반찬"}
 }

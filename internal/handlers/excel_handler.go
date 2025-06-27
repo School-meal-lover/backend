@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/School-meal-lover/backend/internal/services"
@@ -62,29 +64,23 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
     c.JSON(http.StatusOK, result)
 }
 
-// POST /api/v1/process/excel/local - 로컬 엑셀 파일 처리 (개발용)
+// GET /api/v1/process/excel/local - 테스트용 api
 func (h *ExcelHandler) ProcessLocalExcel(c *gin.Context) {
-    var request struct {
-        FilePath string `json:"file_path" binding:"required"`
-    }
-    
-    if err := c.ShouldBindJSON(&request); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{
-            "success": false,
-            "error":   "file_path is required",
-        })
-        return
-    }
-    
-    // 엑셀 처리 서비스 호출
-    result, err := h.excelService.ProcessExcelFile(request.FilePath)
+    filePath := "uploads/2025_6_1_ko.xlsx" 
+    cwd, err := os.Getwd()
+    fmt.Printf("DEBUG: Current Working Directory (CWD): %s\n", cwd)
+ 		result, err := h.excelService.ProcessExcelFile(filePath)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "success": false,
-            "error":   err.Error(),
+            "error":   fmt.Sprintf("Failed to process Excel file: %v", err),
         })
         return
     }
-    
-    c.JSON(http.StatusOK, result)
+	
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "message": "Excel file processed successfully.",
+        "data":    result,
+    })
 }
