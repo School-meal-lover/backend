@@ -1,22 +1,7 @@
 info:
   contact: {}
-  description: The server for Grrrrr application.
+  description: 엑셀 처리 API
   title: Grrrrr API
   version: "1.0"
-paths:
-  /hello:
-    get:
-      consumes:
-      - application/json
-      description: Returns a hello world message
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: hello world
-          schema:
-            type: string
-      summary: Hello World
-      tags:
-      - hello
+paths: {}
 swagger: "2.0"
