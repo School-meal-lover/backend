@@ -18,8 +18,14 @@ func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
     return &ExcelHandler{excelService: excelService}
 }
 
-// POST /api/v1/upload/excel - 엑셀 파일 업로드 및 처리
-//메소드 리시버: struct 타입의 인스턴스 받아서 이 메소드 실행 
+// @Summary 엑셀 처리 API
+// @Description 파일을 업로드 해서 식단 데이터를 디비에 저장한다. 
+// @Tags excel
+// @Accept multipart/form-data 
+// @Param excel formData file true "업로드할 엑셀 파일 (.xlsx 또는 .xls)" - file 타입 사용
+// @Success 200 {object} models.ExcelProcessResult "Excel file processed successfully"
+// @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
+// @Router /upload/excel [post]
 func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
     // 파일 업로드 처리
     file, err := c.FormFile("excel")
@@ -64,10 +70,15 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
     
     c.JSON(http.StatusOK, result)
 }
-
-// GET /api/v1/process/excel/local - 테스트용 api
+// TO DO: 엑셀 파일 저장소가 정해지면 변경 필요
+// @Summary 로컬 엑셀 파일 처리 (개발용)
+// @Description 서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.
+// @Tags excel
+// @Router /process/excel/local [get]
+// @Success 200 {object} models.ExcelProcessResult "Excel file processed successfully."
+// @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
 func (h *ExcelHandler) ProcessLocalExcel(c *gin.Context) {
-    filePath := "uploads/2025_6_1_ko.xlsx" 
+    filePath := "uploads/2025_5_5_ko.xlsx" 
     cwd, err := os.Getwd()
     fmt.Printf("DEBUG: Current Working Directory (CWD): %s\n", cwd)
  		result, err := h.excelService.ProcessExcelFile(filePath)

@@ -1,7 +1,192 @@
+basePath: /api/v1
+definitions:
+  models.DayMeals:
+    properties:
+      date:
+        type: string
+      day_of_week:
+        type: string
+      meals:
+        additionalProperties:
+          $ref: '#/definitions/models.MealInfo'
+        type: object
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: 'Failed to process Excel file: file not found'
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  models.ExcelProcessResult:
+    properties:
+      message:
+        type: string
+      restaurant_name:
+        type: string
+      success:
+        type: boolean
+      total_meals:
+        type: integer
+      total_menu_items:
+        type: integer
+      week_start_date:
+        type: string
+    type: object
+  models.MealInfo:
+    properties:
+      meal_id:
+        type: string
+      meal_type:
+        type: string
+      menu_items:
+        items:
+          $ref: '#/definitions/models.MenuItemResponse'
+        type: array
+    type: object
+  models.MealsSummary:
+    properties:
+      total_days:
+        type: integer
+      total_meals:
+        type: integer
+      total_menu_items:
+        type: integer
+    type: object
+  models.MenuItemResponse:
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      name_en:
+        type: string
+      price:
+        type: number
+    type: object
+  models.RestaurantInfo:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      name_en:
+        type: string
+    type: object
+  models.RestaurantMealsData:
+    properties:
+      meals_by_day:
+        items:
+          $ref: '#/definitions/models.DayMeals'
+        type: array
+      restaurant:
+        $ref: '#/definitions/models.RestaurantInfo'
+      summary:
+        $ref: '#/definitions/models.MealsSummary'
+      week:
+        $ref: '#/definitions/models.WeekInfo'
+    type: object
+  models.RestaurantMealsResponse:
+    properties:
+      code:
+        type: string
+      data:
+        $ref: '#/definitions/models.RestaurantMealsData'
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.WeekInfo:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: string
+      start_date:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
-  description: 엑셀 처리 API
+  description: The server for Grrrrr application.
   title: Grrrrr API
   version: "1.0"
-paths: {}
+paths:
+  /process/excel/local:
+    get:
+      description: 서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.
+      responses:
+        "200":
+          description: Excel file processed successfully.
+          schema:
+            $ref: '#/definitions/models.ExcelProcessResult'
+        "500":
+          description: Failed to process Excel file
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 로컬 엑셀 파일 처리 (개발용)
+      tags:
+      - excel
+  /restaurants/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve meals for a restaurant on a given date
+      parameters:
+      - description: 레스토랑 ID (UUID 형식)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 조회할 날짜 (YYYY-MM-DD 형식)
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 성공적으로 식단 정보 조회
+          schema:
+            $ref: '#/definitions/models.RestaurantMealsResponse'
+        "400":
+          description: 잘못된 요청 파라미터 (ID 또는 날짜 형식 오류)
+        "404":
+          description: 레스토랑 또는 해당 날짜의 식단 정보를 찾을 수 없음
+        "500":
+          description: 서버 내부 오류 발생
+      summary: Get meals for a specific restaurant on a specific date
+      tags:
+      - Meals
+  /upload/excel:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 파일을 업로드 해서 식단 데이터를 디비에 저장한다.
+      parameters:
+      - description: 업로드할 엑셀 파일 (.xlsx 또는 .xls)
+        in: formData
+        name: excel
+        required: true
+        type: file
+      responses:
+        "200":
+          description: Excel file processed successfully
+          schema:
+            $ref: '#/definitions/models.ExcelProcessResult'
+        "500":
+          description: Failed to process Excel file
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 엑셀 처리 API
+      tags:
+      - excel
+schemes:
+- http
 swagger: "2.0"
