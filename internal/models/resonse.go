@@ -31,11 +31,18 @@ type DayMeals struct {
     DayOfWeek string                `json:"day_of_week"`
     Meals     map[string]*MealInfo  `json:"meals"`
 }
-
+type MenuItemResponse struct {
+    ID       string  `json:"id" db:"id"`
+		// MealID   string  `json:"meal_id" db:"meals_id"`
+    Category string  `json:"category" db:"category"`
+    Name     string  `json:"name" db:"name"`
+    NameEn   string  `json:"name_en" db:"name_en"`
+    Price    float64 `json:"price" db:"price"`
+}
 type MealInfo struct {
     MealID    string      `json:"meal_id"`
     MealType  string      `json:"meal_type"`
-    MenuItems []*MenuItem `json:"menu_items"`
+    MenuItems []*MenuItemResponse `json:"menu_items"`
 }
 
 type MealsSummary struct {

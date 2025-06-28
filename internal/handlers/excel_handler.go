@@ -67,7 +67,7 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
 
 // GET /api/v1/process/excel/local - 테스트용 api
 func (h *ExcelHandler) ProcessLocalExcel(c *gin.Context) {
-    filePath := "uploads/2025_6_1_ko.xlsx" 
+    filePath := "uploads/2025_5_5_ko.xlsx" 
     cwd, err := os.Getwd()
     fmt.Printf("DEBUG: Current Working Directory (CWD): %s\n", cwd)
  		result, err := h.excelService.ProcessExcelFile(filePath)

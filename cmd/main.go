@@ -51,11 +51,11 @@ func main() {
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
-		// 기존 식단 조회 API
+		// 주간 식단 조회 API
 		api.GET("/restaurants/:id", mealHandler.GetRestaurantMeals)
 
 		//@Description 엑셀 처리 API
-		// api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
+		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
 		api.GET("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
 	}
 	// Set up Swagger
