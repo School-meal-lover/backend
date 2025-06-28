@@ -6,6 +6,12 @@ type RestaurantMealsResponse struct {
     Error   string                   `json:"error,omitempty"`
     Code    string                   `json:"code,omitempty"`
 }
+//
+type ErrorResponse struct {
+    Success bool   `json:"success" example:"false"`    
+    Error   string `json:"error" example:"Failed to process Excel file: file not found"` 
+}
+
 // RestaurantMealsData contains the meals data for a restaurant for a specific week. - This is the main data structure returned by the API.
 type RestaurantMealsData struct {
     Restaurant *RestaurantInfo       `json:"restaurant"`

@@ -95,7 +95,11 @@ func (r *MealRepository) InsertMenuItems(menuItems []models.MenuItem) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil  && err != sql.ErrTxDone {
+			log.Printf("failed to rollback transaction: %v", err)
+		}	
+		}()
 
 	stmt, err := tx.Prepare(`
 				INSERT INTO menu_items (id, meals_id, category, name, name_en, price, created_at, updated_at)
@@ -234,7 +238,7 @@ func (r *MealRepository) GetMealsData(weekID string) ([]*models.DayMeals, *model
     dateJ, errJ := time.Parse(("2006-01-02"), orderedDays[j].Date)
     if errI != nil || errJ != nil {
       log.Printf("failed to parse date: %v, %v", errI, errJ)
-      return false
+      return orderedDays[i].Date < orderedDays[j].Date
     }
     return dateI.Before(dateJ)
   })

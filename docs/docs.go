@@ -30,7 +30,10 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to process Excel file\" example:{\"success\":false,\"error\":\"Failed to process Excel file: \u003cerror message\u003e"
+                        "description": "Failed to process Excel file",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -108,6 +111,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.ExcelProcessResult"
                         }
+                    },
+                    "500": {
+                        "description": "Failed to process Excel file",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -128,6 +137,19 @@ const docTemplate = `{
                     "additionalProperties": {
                         "$ref": "#/definitions/models.MealInfo"
                     }
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to process Excel file: file not found"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },

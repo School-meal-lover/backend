@@ -24,6 +24,7 @@ func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
 // @Accept multipart/form-data 
 // @Param excel formData file true "업로드할 엑셀 파일 (.xlsx 또는 .xls)" - file 타입 사용
 // @Success 200 {object} models.ExcelProcessResult "Excel file processed successfully"
+// @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
 // @Router /upload/excel [post]
 func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
     // 파일 업로드 처리
@@ -69,13 +70,13 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
     
     c.JSON(http.StatusOK, result)
 }
-
+// TO DO: 엑셀 파일 저장소가 정해지면 변경 필요
 // @Summary 로컬 엑셀 파일 처리 (개발용)
 // @Description 서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.
 // @Tags excel
 // @Router /process/excel/local [get]
 // @Success 200 {object} models.ExcelProcessResult "Excel file processed successfully."
-// @Failure 500 "Failed to process Excel file" example:{"success":false,"error":"Failed to process Excel file: <error message>"}
+// @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
 func (h *ExcelHandler) ProcessLocalExcel(c *gin.Context) {
     filePath := "uploads/2025_5_5_ko.xlsx" 
     cwd, err := os.Getwd()

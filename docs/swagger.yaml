@@ -11,6 +11,15 @@ definitions:
           $ref: '#/definitions/models.MealInfo'
         type: object
     type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: 'Failed to process Excel file: file not found'
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
   models.ExcelProcessResult:
     properties:
       message:
@@ -117,8 +126,9 @@ paths:
           schema:
             $ref: '#/definitions/models.ExcelProcessResult'
         "500":
-          description: 'Failed to process Excel file" example:{"success":false,"error":"Failed
-            to process Excel file: <error message>'
+          description: Failed to process Excel file
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
       summary: 로컬 엑셀 파일 처리 (개발용)
       tags:
       - excel
@@ -170,6 +180,10 @@ paths:
           description: Excel file processed successfully
           schema:
             $ref: '#/definitions/models.ExcelProcessResult'
+        "500":
+          description: Failed to process Excel file
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
       summary: 엑셀 처리 API
       tags:
       - excel
