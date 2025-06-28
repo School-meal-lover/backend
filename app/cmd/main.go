@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/School-meal-lover/backend/internal/database"
-	"github.com/School-meal-lover/backend/internal/handlers"
-	"github.com/School-meal-lover/backend/internal/repository"
-	"github.com/School-meal-lover/backend/internal/services"
+	"github.com/School-meal-lover/backend/app/internal/database"
+	"github.com/School-meal-lover/backend/app/internal/handlers"
+	"github.com/School-meal-lover/backend/app/internal/repository"
+	"github.com/School-meal-lover/backend/app/internal/services"
 
 	_ "github.com/School-meal-lover/backend/docs" // Swagger 문서
 	gin "github.com/gin-gonic/gin"

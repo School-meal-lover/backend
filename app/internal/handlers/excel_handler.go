@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/School-meal-lover/backend/internal/services"
+	"github.com/School-meal-lover/backend/app/internal/services"
 	"github.com/gin-gonic/gin"
 )
 

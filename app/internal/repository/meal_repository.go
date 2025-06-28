@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/School-meal-lover/backend/internal/models"
+	"github.com/School-meal-lover/backend/app/internal/models"
 
 	"github.com/google/uuid"
 )

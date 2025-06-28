@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/School-meal-lover/backend/internal/models"
+	"github.com/School-meal-lover/backend/app/internal/models"
 
 	"github.com/xuri/excelize/v2"
 )
