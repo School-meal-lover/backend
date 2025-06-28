@@ -40,7 +40,7 @@ func (s *MealService) GetRestaurantWeekMeals(restaurantID, date string) (*models
 	}
 
 	// 식단 데이터 조회 및 에러 처리
-	mealsByDay, summary, err := s.mealRepo.GetMealsData(week.ID)
+	OrderedmealsByDay, summary, err := s.mealRepo.GetMealsData(week.ID)
 	if err != nil {
 		// 식단 데이터 조회 실패는 특정 코드로 처리
 		return &models.RestaurantMealsResponse{
@@ -54,7 +54,7 @@ func (s *MealService) GetRestaurantWeekMeals(restaurantID, date string) (*models
 	response := &models.RestaurantMealsData{
 		Restaurant: restaurant,
 		Week:       week,
-		MealsByDay: mealsByDay,
+		MealsByDay: OrderedmealsByDay,
 		Summary:    summary,
 	}
 

@@ -10,7 +10,7 @@ type RestaurantMealsResponse struct {
 type RestaurantMealsData struct {
     Restaurant *RestaurantInfo       `json:"restaurant"`
     Week       *WeekInfo            `json:"week"`
-    MealsByDay map[string]*DayMeals `json:"meals_by_day"`
+    MealsByDay []*DayMeals `json:"meals_by_day"`
     Summary    *MealsSummary        `json:"summary"`
 }
 

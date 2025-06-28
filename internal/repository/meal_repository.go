@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"sort"
 	"time"
 
 	"github.com/School-meal-lover/backend/internal/models"
@@ -154,7 +156,7 @@ func (r *MealRepository) GetWeekInfo(restaurantId, date string) (*models.WeekInf
 	return week, nil
 }
 
-func (r *MealRepository) GetMealsData(weekID string) (map[string]*models.DayMeals, *models.MealsSummary, error) {
+func (r *MealRepository) GetMealsData(weekID string) ([]*models.DayMeals, *models.MealsSummary, error) {
 	query := `
 			SELECT
 								m.id, m.date, m.day_of_week, m.meal_type, mi.category,
@@ -223,12 +225,25 @@ func (r *MealRepository) GetMealsData(weekID string) (map[string]*models.DayMeal
 			totalMenuItems++
 		}
 	}
+	var orderedDays []*models.DayMeals
+	for _, dayMeal := range mealsByDay {
+		orderedDays = append(orderedDays, dayMeal)
+  }
+	sort.Slice(orderedDays, func(i,j int) bool {
+    dateI, errI := time.Parse(("2006-01-02"), orderedDays[i].Date)
+    dateJ, errJ := time.Parse(("2006-01-02"), orderedDays[j].Date)
+    if errI != nil || errJ != nil {
+      log.Printf("failed to parse date: %v, %v", errI, errJ)
+      return false
+    }
+    return dateI.Before(dateJ)
+  })
 
 	summary := &models.MealsSummary{
-		TotalDays:      len(mealsByDay),
+		TotalDays:      len(orderedDays),
 		TotalMeals:     totalMeals,
 		TotalMenuItems: totalMenuItems,
 	}
 
-	return mealsByDay, summary, nil
+	return orderedDays, summary, nil
 }
