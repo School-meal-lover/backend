@@ -6,7 +6,7 @@ type RestaurantMealsResponse struct {
     Error   string                   `json:"error,omitempty"`
     Code    string                   `json:"code,omitempty"`
 }
-
+// RestaurantMealsData contains the meals data for a restaurant for a specific week. - This is the main data structure returned by the API.
 type RestaurantMealsData struct {
     Restaurant *RestaurantInfo       `json:"restaurant"`
     Week       *WeekInfo            `json:"week"`
@@ -25,26 +25,27 @@ type WeekInfo struct {
     StartDate string `json:"start_date"`
     EndDate   string `json:"end_date"`
 }
-
+// DayMeals represents the meals for a specific day of the week.
 type DayMeals struct {
     Date      string                `json:"date"`
     DayOfWeek string                `json:"day_of_week"`
     Meals     map[string]*MealInfo  `json:"meals"`
 }
+// MenuItemResponse represents a single menu item in a meal.
 type MenuItemResponse struct {
     ID       string  `json:"id" db:"id"`
-		// MealID   string  `json:"meal_id" db:"meals_id"`
     Category string  `json:"category" db:"category"`
     Name     string  `json:"name" db:"name"`
     NameEn   string  `json:"name_en" db:"name_en"`
     Price    float64 `json:"price" db:"price"`
 }
+// MealInfo represents a meal with its associated menu items.
 type MealInfo struct {
     MealID    string      `json:"meal_id"`
     MealType  string      `json:"meal_type"`
     MenuItems []*MenuItemResponse `json:"menu_items"`
 }
-
+// MealsSummary contains summary information about the meals for a week.
 type MealsSummary struct {
     TotalDays      int `json:"total_days"`
     TotalMeals     int `json:"total_meals"`

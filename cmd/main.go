@@ -14,8 +14,10 @@ import (
 
 // @title Grrrrr API
 // @version 1.0
+// @host localhost:8080
 // @description The server for Grrrrr application.
-
+// @BasePath /api/v1
+// @schemes http
 func main() {
 	router := gin.Default()
 
@@ -51,11 +53,10 @@ func main() {
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
-		// 주간 식단 조회 API
 		api.GET("/restaurants/:id", mealHandler.GetRestaurantMeals)
 
-		//@Description 엑셀 처리 API
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
+
 		api.GET("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
 	}
 	// Set up Swagger

@@ -1,10 +1,271 @@
 {
+    "schemes": [
+        "http"
+    ],
     "swagger": "2.0",
     "info": {
-        "description": "엑셀 처리 API",
+        "description": "The server for Grrrrr application.",
         "title": "Grrrrr API",
         "contact": {},
         "version": "1.0"
     },
-    "paths": {}
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/process/excel/local": {
+            "get": {
+                "description": "서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.",
+                "tags": [
+                    "excel"
+                ],
+                "summary": "로컬 엑셀 파일 처리 (개발용)",
+                "responses": {
+                    "200": {
+                        "description": "Excel file processed successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExcelProcessResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to process Excel file\" example:{\"success\":false,\"error\":\"Failed to process Excel file: \u003cerror message\u003e"
+                    }
+                }
+            }
+        },
+        "/restaurants/{id}": {
+            "get": {
+                "description": "Retrieve meals for a restaurant on a given date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Meals"
+                ],
+                "summary": "Get meals for a specific restaurant on a specific date",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "레스토랑 ID (UUID 형식)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "조회할 날짜 (YYYY-MM-DD 형식)",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "성공적으로 식단 정보 조회",
+                        "schema": {
+                            "$ref": "#/definitions/models.RestaurantMealsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "잘못된 요청 파라미터 (ID 또는 날짜 형식 오류)"
+                    },
+                    "404": {
+                        "description": "레스토랑 또는 해당 날짜의 식단 정보를 찾을 수 없음"
+                    },
+                    "500": {
+                        "description": "서버 내부 오류 발생"
+                    }
+                }
+            }
+        },
+        "/upload/excel": {
+            "post": {
+                "description": "파일을 업로드 해서 식단 데이터를 디비에 저장한다.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "excel"
+                ],
+                "summary": "엑셀 처리 API",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "업로드할 엑셀 파일 (.xlsx 또는 .xls)",
+                        "name": "excel",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Excel file processed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExcelProcessResult"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.DayMeals": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "day_of_week": {
+                    "type": "string"
+                },
+                "meals": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/models.MealInfo"
+                    }
+                }
+            }
+        },
+        "models.ExcelProcessResult": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "restaurant_name": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "total_meals": {
+                    "type": "integer"
+                },
+                "total_menu_items": {
+                    "type": "integer"
+                },
+                "week_start_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MealInfo": {
+            "type": "object",
+            "properties": {
+                "meal_id": {
+                    "type": "string"
+                },
+                "meal_type": {
+                    "type": "string"
+                },
+                "menu_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MenuItemResponse"
+                    }
+                }
+            }
+        },
+        "models.MealsSummary": {
+            "type": "object",
+            "properties": {
+                "total_days": {
+                    "type": "integer"
+                },
+                "total_meals": {
+                    "type": "integer"
+                },
+                "total_menu_items": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.MenuItemResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_en": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.RestaurantInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_en": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RestaurantMealsData": {
+            "type": "object",
+            "properties": {
+                "meals_by_day": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DayMeals"
+                    }
+                },
+                "restaurant": {
+                    "$ref": "#/definitions/models.RestaurantInfo"
+                },
+                "summary": {
+                    "$ref": "#/definitions/models.MealsSummary"
+                },
+                "week": {
+                    "$ref": "#/definitions/models.WeekInfo"
+                }
+            }
+        },
+        "models.RestaurantMealsResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "data": {
+                    "$ref": "#/definitions/models.RestaurantMealsData"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.WeekInfo": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

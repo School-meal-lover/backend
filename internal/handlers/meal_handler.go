@@ -21,7 +21,13 @@ func NewMealHandler(mealService *services.MealService) *MealHandler {
 // @Tags Meals
 // @Accept json
 // @Produce json
-// @Param id path string true "Restaurant ID"
+// @Param id path string true "레스토랑 ID (UUID 형식)" format:"uuid" example:"db6017d7-094a-4252-bdb6-28cc3f832447"
+// @Param date query string true "조회할 날짜 (YYYY-MM-DD 형식)" example:"2025-06-28"
+// @Success 200 {object} models.RestaurantMealsResponse "성공적으로 식단 정보 조회"
+// @Failure 400 "잘못된 요청 파라미터 (ID 또는 날짜 형식 오류)"
+// @Failure 404 "레스토랑 또는 해당 날짜의 식단 정보를 찾을 수 없음"
+// @Failure 500 "서버 내부 오류 발생"
+// @Router /restaurants/{id} [get]
 func (h *MealHandler) GetRestaurantMeals(c *gin.Context) {
 	restaurantID := c.Param("id")
 	date := c.Query("date")

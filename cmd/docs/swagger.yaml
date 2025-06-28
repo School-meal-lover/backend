@@ -1,0 +1,8 @@
+basePath: /api/v1
+info:
+  contact: {}
+  description: The server for Grrrrr application.
+  title: Grrrrr API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
