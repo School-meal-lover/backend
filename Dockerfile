@@ -32,6 +32,8 @@ COPY migrations ./migrations
 # S3 사용시 변경 필요
 RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
 
+USER appuser
+
 ENTRYPOINT ["./server"]
 
 EXPOSE 8080
