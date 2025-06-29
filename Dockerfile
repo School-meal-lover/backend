@@ -13,8 +13,10 @@ RUN go mod download
 
 COPY app/ ./app/
 COPY docs/ ./docs/
+COPY migrations/ ./migrations/
 
 RUN go build -o server -ldflags="-s -w" ./app/cmd/main.go
+RUN go build -o migrate -ldflags="-s -w" ./app/cmd/migrate/main.go
 
 # Runner stage
 FROM alpine:3.18
