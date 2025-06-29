@@ -33,6 +33,11 @@ func main(){
 	} else {
 		log.Println("Migrations applied successfully.")
 	}
+	defer func() {
+		if sourceErr, dbErr := m.Close(); sourceErr != nil {
+			log.Printf("Warning: Failed to close migration instance: source=%v, db=%v", sourceErr, dbErr)
+		}
+	}()
 	
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNoChange {
