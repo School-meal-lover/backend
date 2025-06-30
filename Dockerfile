@@ -28,6 +28,7 @@ WORKDIR /app
 COPY --from=builder /build/server ./
 COPY --from=builder /build/migrate ./migrate
 COPY migrations ./migrations
+COPY .env /app/.env
 
 # S3 사용시 변경 필요
 RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
