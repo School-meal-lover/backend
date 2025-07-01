@@ -13,10 +13,8 @@ RUN go mod download
 
 COPY app/ ./app/
 COPY docs/ ./docs/
-COPY migrations/ ./migrations/
 
 RUN go build -o server -ldflags="-s -w" ./app/cmd/main.go
-RUN go build -o migrate -ldflags="-s -w" ./app/cmd/migrate/main.go
 
 # Runner stage
 FROM alpine:3.18
@@ -26,8 +24,6 @@ RUN adduser -D appuser
 WORKDIR /app
 
 COPY --from=builder /build/server ./
-COPY --from=builder /build/migrate ./migrate
-COPY migrations ./migrations
 COPY .env /app/.env
 
 # S3 사용시 변경 필요
