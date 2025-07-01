@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/School-meal-lover/backend/internal/models"
-	"github.com/School-meal-lover/backend/internal/services"
+	"github.com/School-meal-lover/backend/app/internal/models"
+	"github.com/School-meal-lover/backend/app/internal/services"
 	"github.com/gin-gonic/gin"
 )
 

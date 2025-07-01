@@ -3,8 +3,8 @@ package services
 import (
 	"time"
 
-	"github.com/School-meal-lover/backend/internal/models"
-	"github.com/School-meal-lover/backend/internal/repository"
+	"github.com/School-meal-lover/backend/app/internal/models"
+	"github.com/School-meal-lover/backend/app/internal/repository"
 )
 
 type MealService struct {

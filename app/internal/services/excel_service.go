@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/School-meal-lover/backend/internal/models"
-	"github.com/School-meal-lover/backend/internal/repository"
-	"github.com/School-meal-lover/backend/pkg/excel"
+	"github.com/School-meal-lover/backend/app/internal/models"
+	"github.com/School-meal-lover/backend/app/internal/repository"
+	"github.com/School-meal-lover/backend/app/pkg/excel"
 )
 
 type ExcelService struct {
