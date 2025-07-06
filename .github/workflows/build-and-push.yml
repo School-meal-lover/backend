@@ -1,0 +1,86 @@
+name: deploy to LightSail
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select Environment enviroment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: "Image Tag (e.g. latest or develop)"
+        required: true
+        default: "develop"
+        type: string
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout infra repository code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Get Enviroment Specific Variables
+        id: env_vars
+        run: |
+          echo "server_host=${{ secrets.LIGHTSAIL_HOST }}" >> $GITHUB_OUTPUT
+          echo "database_url=${{ secrets.DATABASE_URL }}" >> $GITHUB_OUTPUT
+          echo "app_port=${{ secrets.APP_PORT }}" >> $GITHUB_OUTPUT
+          echo "docker_username=${{ secrets.DOCKER_USERNAME }}" >> $GITHUB_OUTPUT
+
+      - name: Add Lightsail Host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+          chmode 600 ~/.ssh/known_hosts
+
+      - name: transfer Docker compose file and .env to Lightsail
+        run: |
+          scp -r docker-compose.yml ${{ secrets.LIGHTSAIL_USER }}@${{ steps.env_vars.outputs.server_host }}:~/app/docker-compose.yml
+
+      - name: deploy on Lightsail
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.env_vars.outputs.server_host }}
+          username: ${{ secrets.LIGHTSAIL_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "DATABASE_URL=${{ steps.env_vars.outputs.database_url }}" > .env
+            echo "APP_PORT=${{ steps.env_vars.outputs.app_port }}" >> .env
+            echo "IMAGE_TAG=${{ github.event.inputs.image_tag }}" >> .env # 선택된 이미지 태그 주입
+            echo "DOCKER_USERNAME=${{ steps.env_vars.outputs.docker_username }}" >> .env # Docker Username 주입 (docker-compose.yml에서 사용)
+
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            DOCKER_COMPOSE_FILE="docker-compose.yml"
+
+            echo "Building migrator and starting db service for ${{ github.event.inputs.environment }}..."
+            docker-compose -f ${DOCKER_COMPOSE_FILE} --env-file .env up -d db
+
+            echo "Waiting for DB service to be healthy..."
+            for i in $(seq 1 10); do
+              if docker-compose -f ${DOCKER_COMPOSE_FILE} --env-file .env ps db | grep "healthy"; then
+                echo "DB service is healthy."
+                break
+              fi
+              echo "Waiting for DB to be healthy... ($i/10)"
+              sleep 6
+            done
+
+            echo "Running database migrations for ${{ github.event.inputs.environment }}..."
+            docker-compose -f ${DOCKER_COMPOSE_FILE} --env-file .env run --rm migrator /app/migrate up
+
+            echo "Building and starting app service for ${{ github.event.inputs.environment }}..."
+            docker-compose -f ${DOCKER_COMPOSE_FILE} --env-file .env up -d --build --force-recreate app
+
+            echo "Deployment to ${{ github.event.inputs.environment }} complete!"
