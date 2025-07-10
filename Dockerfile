@@ -29,7 +29,7 @@ COPY --from=builder /build/server ./
 RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
 
 USER appuser
-
-ENTRYPOINT ["./server"]
-
+  
 EXPOSE 8080
+
+ENTRYPOINT ["/bin/sh", "-c", "/app/migrate up && /app/main"]
