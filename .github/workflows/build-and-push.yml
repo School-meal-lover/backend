@@ -7,7 +7,7 @@ on:
       - develop
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: school-meal-lover/backend
+  IMAGE_NAME: ${{github.repository}}
 
 jobs:
   build_and_push:
