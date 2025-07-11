@@ -21,11 +21,12 @@ RUN go build -o server -ldflags="-s -w" ./app/cmd/main.go
 FROM alpine:3.18
 
 RUN apk add --no-cache curl \
-    && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xvz \
-    && mv migrate /app/migrate \
-    && chmod +x /app/migrate \
-    && /app/migrate --version
-
+    && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz -o migrate.tar.gz \
+    && tar xvzf migrate.tar.gz \
+    && rm migrate.tar.gz \ 
+    && chmod +x migrate \  
+    && mv migrate /usr/local/bin/migrate 
+    
 RUN adduser -D appuser
 
 WORKDIR /app
