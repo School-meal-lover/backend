@@ -20,13 +20,18 @@ RUN go build -o server -ldflags="-s -w" ./app/cmd/main.go
 # Runner stage
 FROM alpine:3.18
 
-RUN apk add --no-cache curl \
-    && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz -o migrate.tar.gz \
+RUN apk update && apk add --no-cache curl tar && curl --version && tar --version
+
+# migrate 도구 설치
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz -o migrate.tar.gz \
     && tar xvzf migrate.tar.gz \
-    && rm migrate.tar.gz \ 
-    && chmod +x migrate \  
-    && mv migrate /usr/local/bin/migrate 
-    
+    && ls -l /  \
+    && mkdir -p /app \
+    && mv migrate /app/migrate 2>/dev/null || mv migrate.linux-amd64 /app/migrate 2>/dev/null || { echo "Failed to move migrate binary"; ls -l /; exit 1; } \
+    && chmod +x /app/migrate \
+    && ls -l /app \
+    && /app/migrate --version || { echo "migrate version check failed"; exit 1; }
+
 RUN adduser -D appuser
 
 WORKDIR /app
