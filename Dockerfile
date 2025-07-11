@@ -23,13 +23,15 @@ FROM alpine:3.18
 RUN apk add --no-cache curl \
     && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xvz \
     && mv migrate /app/migrate \
-    && chmod +x /app/migrate
-    
+    && chmod +x /app/migrate \
+    && /app/migrate --version
+
 RUN adduser -D appuser
 
 WORKDIR /app
 
 COPY --from=builder /build/server ./
+COPY --from=builder /build/migrations ./migrations/
 
 # S3 사용시 변경 필요
 RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
@@ -38,4 +40,4 @@ USER appuser
   
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh", "-c", "/app/migrate up && /app/server"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/migrate -path /app/migrations -database \"${DATABASE_URL}\" up && /app/server"]
