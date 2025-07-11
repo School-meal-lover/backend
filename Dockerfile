@@ -32,4 +32,4 @@ USER appuser
   
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh", "-c", "/app/migrate up && /app/main"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/migrate up && /app/server"]
