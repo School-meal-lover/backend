@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
-
 	_ "github.com/lib/pq"
 )
 
@@ -15,7 +13,6 @@ var Db *sql.DB
 
 func ConnectDatabase() {
 	// Load environment variables from .env file and set them in the system
-	_ = godotenv.Load()
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")

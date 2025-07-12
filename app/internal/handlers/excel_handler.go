@@ -2,16 +2,23 @@ package handlers
 
 import (
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"github.com/School-meal-lover/backend/app/internal/models"
 	"github.com/School-meal-lover/backend/app/internal/services"
 	"github.com/gin-gonic/gin"
 )
 
 type ExcelHandler struct {
     excelService *services.ExcelService
+}
+type DualExcelProcessResponse struct {
+    Success   bool                        `json:"success"`
+    ResultKo  models.ExcelProcessResult   `json:"result_ko"`
+    ResultEn  models.ExcelProcessResult   `json:"result_en"`
 }
 
 func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
@@ -22,21 +29,17 @@ func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
 // @Description 파일을 업로드 해서 식단 데이터를 디비에 저장한다. 
 // @Tags excel
 // @Accept multipart/form-data 
-// @Param excel formData file true "업로드할 엑셀 파일 (.xlsx 또는 .xls)" - file 타입 사용
-// @Success 200 {object} models.ExcelProcessResult "Excel file processed successfully"
+// @Param excel_ko formData file true "한국어 엑셀 파일"
+// @Param excel_en formData file true "영어 엑셀 파일"
+// @Success 200 {object} DualExcelProcessResponse "Excel file processed successfully"
 // @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
 // @Router /upload/excel [post]
 func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
-		form, err := c.MultipartForm()
-		if err != nil || len(form.File) < 2 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"success": false,
-				"error":   "two excel files are required",
-			})
-			return
-		}
+		var files [2]*multipart.FileHeader
+    var err error
 
-		files := form.File["excel"]
+		files[0], err = c.FormFile("excel_ko")
+		files[1], err = c.FormFile("excel_en")
 
 		var fileKoPath, fileEnPath string
     for i,file:= range files[:2]{

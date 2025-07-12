@@ -83,13 +83,30 @@ func (p *Parser) ReadWeekStartDate(f *ExcelFile) (time.Time, error) {
     return parsedDate, nil
 }
 
+func (p *Parser) GetFirstNonEmptySheet(f *ExcelFile) (string, error) {
+    for _, sheetName := range f.GetSheetList() {
+        rows, err := f.GetRows(sheetName)
+        if err != nil {
+            continue 
+        }
+
+        for _, row := range rows {
+            for _, cell := range row {
+                if strings.TrimSpace(cell) != "" {
+                    return sheetName, nil
+                }
+            }
+        }
+    }
+    return "", fmt.Errorf("no non-empty sheet found")
+}
 // 엑셀에서 날짜 정보 구성
-func (p *Parser) BuildDatesFromExcel(f *ExcelFile) ([]models.DateInfo, error) {
+func (p *Parser) BuildDatesFromExcel(f *ExcelFile, sheetName string) ([]models.DateInfo, error) {
     cols := []string{"D", "E", "F", "G", "H"}
     var dates []models.DateInfo
     
     for _, col := range cols {
-        cell, err := f.GetCellValue("12", col+"6")
+        cell, err := f.GetCellValue(sheetName, col+"6")
         if err != nil {
             return nil, fmt.Errorf("failed to read cell %s6: %w", col, err)
         }

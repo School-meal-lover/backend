@@ -58,7 +58,11 @@ func (s *ExcelService) ProcessExcelFile(filePath string) (*models.ExcelProcessRe
     }
     
     // 4. 날짜 정보 구성
-    dates, err := s.parser.BuildDatesFromExcel(f)
+		sheetName, err := s.parser.GetFirstNonEmptySheet(f)
+		if err != nil {
+		return nil, fmt.Errorf("failed to get first non-empty sheet: %w", err)
+	}
+    dates, err := s.parser.BuildDatesFromExcel(f, sheetName)
     if err != nil {
         return nil, fmt.Errorf("failed to build dates: %w", err)
     }
@@ -88,7 +92,11 @@ func (s *ExcelService) ProcessEnglishExcelFile(filePath string, weekID string) (
 	}
 	defer f.Close()
 
-	dates, err := s.parser.BuildDatesFromExcel(f)
+	sheetName,err := s.parser.GetFirstNonEmptySheet(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get first non-empty sheet: %w", err)
+	}
+	dates, err := s.parser.BuildDatesFromExcel(f, sheetName)
 	if err != nil {
 			return nil, fmt.Errorf("failed to build dates: %w", err)
 	}
