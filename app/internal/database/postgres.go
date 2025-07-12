@@ -12,7 +12,6 @@ import (
 var Db *sql.DB
 
 func ConnectDatabase() {
-	// Load environment variables from .env file and set them in the system
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
