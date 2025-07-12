@@ -48,9 +48,10 @@ type MealTypeConfig struct {
 // 응답용 구조체
 type ExcelProcessResult struct {
     Success        bool   `json:"success"`
-    RestaurantName string `json:"restaurant_name"`
-    WeekStartDate  string `json:"week_start_date"`
-    TotalMeals     int    `json:"total_meals"`
-    TotalMenuItems int    `json:"total_menu_items"`
+    RestaurantName string `json:"restaurant_name,omitempty"`
+		WeekID 			string `json:"week_id,omitempty"`
+    WeekStartDate  string `json:"week_start_date,omitempty"`
+    TotalMeals     int    `json:"total_meals,omitempty"`
+    TotalMenuItems int    `json:"total_menu_items,omitempty"`
     Message        string `json:"message"`
 }

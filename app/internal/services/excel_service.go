@@ -73,12 +73,66 @@ func (s *ExcelService) ProcessExcelFile(filePath string) (*models.ExcelProcessRe
         Success:        true,
         RestaurantName: restaurantName,
         WeekStartDate:  weekStartDate.Format("2006-01-02"),
+				WeekID:         weekID,
         TotalMeals:     totalMeals,
         TotalMenuItems: totalMenuItems,
-        Message:        "Excel file processed successfully",
+        Message:        "KoreanExcel file processed successfully",
     }, nil
 }
+// 영어 엑셀 파일 처리
 
+func (s *ExcelService) ProcessEnglishExcelFile(filePath string, weekID string) (*models.ExcelProcessResult, error) {
+	f, err := s.parser.OpenExcelFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open English Excel file: %w", err)
+	}
+	defer f.Close()
+
+	dates, err := s.parser.BuildDatesFromExcel(f)
+	if err != nil {
+			return nil, fmt.Errorf("failed to build dates: %w", err)
+	}
+
+	mealTypes := s.getMealTypeConfigs()
+	updatedCount := 0
+
+	for _, mealType := range mealTypes {
+		for _, dateInfo := range dates{
+			mealID, err := s.mealRepo.GetMealIDByWeekDateAndType(weekID, dateInfo.Date, mealType.MealType)
+			if err != nil {
+				log.Printf("Meal not found for %s %s: %v", dateInfo.Date, mealType.MealType, err)
+				continue
+			}
+			englishNames, err := s.parser.ReadMenuItems(f, dateInfo.Col, mealType.StartRow, mealType.EndRow)
+			if err != nil {
+				log.Printf("Failed to read English menu items for %s %s: %v", dateInfo.Date, mealType.MealType, err)
+				continue
+			}
+			if len(englishNames) == 0 {
+				continue
+			}
+			koreanMenuItems, err := s.mealRepo.GetMenuItemsByMealIDOrdered(mealID)
+			if err != nil {
+					log.Printf("Failed to fetch Korean menu items for mealID %s: %v", mealID, err)
+					continue
+			}
+			minLen := min(len(englishNames), len(koreanMenuItems))
+			for i := 0; i < minLen; i++ {
+					err := s.mealRepo.UpdateMenuItemNameEn(koreanMenuItems[i].ID, englishNames[i])
+					if err != nil {
+							log.Printf("Failed to update NameEn for menu item %s: %v", koreanMenuItems[i].ID, err)
+							continue
+					}
+					updatedCount++
+			}
+		}
+	}
+	return &models.ExcelProcessResult{
+        Success:        true,
+				WeekID:         weekID,
+        Message:        "English Excel file processed successfully",
+    }, nil
+}
 // 식사 및 메뉴 처리 (비즈니스 로직)
 func (s *ExcelService) processMealsAndMenus(f *excel.ExcelFile, weekID string, dates []models.DateInfo) (int, int, error) {
     mealTypes := s.getMealTypeConfigs()

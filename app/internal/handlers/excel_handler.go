@@ -27,49 +27,74 @@ func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
 // @Failure 500 {object} models.ErrorResponse "Failed to process Excel file"
 // @Router /upload/excel [post]
 func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
-    // 파일 업로드 처리
-    file, err := c.FormFile("excel")
+		form, err := c.MultipartForm()
+		if err != nil || len(form.File) < 2 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "two excel files are required",
+			})
+			return
+		}
+
+		files := form.File["excel"]
+
+		var fileKoPath, fileEnPath string
+    for i,file:= range files[:2]{
+			if file == nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"success": false,
+					"error":   fmt.Sprintf("file %d is missing",i),
+				})
+				return
+			}
+
+			ext := filepath.Ext(file.Filename)
+			if ext != ".xlsx" && ext != ".xls" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"success": false,
+					"error":  fmt.Sprintf("file %d has invalid extension", i),
+				})
+				return
+			}
+			savePath := "uploads/" + file.Filename
+			if err := c.SaveUploadedFile(file, savePath); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"success": false,
+					"error":   fmt.Sprintf("failed to save file %d", i),
+				})
+				return
+			}
+			if i == 0 {
+            fileKoPath = savePath
+        } else {
+            fileEnPath = savePath
+        }
+		}
+
+    resultKo, err := h.excelService.ProcessExcelFile(fileKoPath)
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{
-            "success": false,
-            "error":   "excel file is required",
-        })
-        return
-    }
-    
-    // 파일 확장자 검증
-    ext := filepath.Ext(file.Filename)
-    if ext != ".xlsx" && ext != ".xls" {
-        c.JSON(http.StatusBadRequest, gin.H{
-            "success": false,
-            "error":   "only excel files (.xlsx, .xls) are allowed",
-        })
-        return
-    }
-    
-    // 파일 저장 
-		// TODO: 버킷에 저장하는 것으로 변경 필요
-    filename := "uploads/" + file.Filename
-    if err := c.SaveUploadedFile(file, filename); err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "success": false,
-            "error":   "failed to save file",
+            "error":   "failed to process Korean Excel: " + err.Error(),
         })
         return
     }
-    
-    // 엑셀 처리 서비스 호출
-    result, err := h.excelService.ProcessExcelFile(filename)
+
+    resultEn, err := h.excelService.ProcessEnglishExcelFile(fileEnPath, resultKo.WeekID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "success": false,
-            "error":   err.Error(),
+            "error":   "failed to process English Excel: " + err.Error(),
         })
         return
     }
-    
-    c.JSON(http.StatusOK, result)
-}
+
+    c.JSON(http.StatusOK, gin.H{
+        "success":     true,
+        "result_ko":   resultKo,
+        "result_en":   resultEn,
+    })
+	}
 // TO DO: 엑셀 파일 저장소가 정해지면 변경 필요
 // @Summary 로컬 엑셀 파일 처리 (개발용)
 // @Description 서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.
