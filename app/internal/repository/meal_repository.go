@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/School-meal-lover/backend/app/internal/models"
@@ -256,7 +257,7 @@ func (r *MealRepository) GetMealIDByWeekDateAndType(weekID, date, mealType strin
     var mealID string
     query := `
         SELECT id FROM meals 
-        WHERE week_id = $1 AND date = $2 AND meal_type = $3
+        WHERE weeks_id = $1 AND date = $2 AND meal_type = $3
         LIMIT 1
     `
     err := r.db.QueryRow(query, weekID, date, mealType).Scan(&mealID)
@@ -294,5 +295,25 @@ func (r *MealRepository) UpdateMenuItemNameEn(menuItemID, nameEn string) error {
         WHERE id = $2
     `, nameEn, menuItemID)
     return err
+}
+func (r *MealRepository) UpdateMenuItemsEnglishNameBatch(items []models.MenuItem) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	query := "UPDATE menu_items SET name_en = CASE id"
+	var ids []string
+	args := []interface{}{}
+
+	for i, item := range items {
+		query += fmt.Sprintf(" WHEN $%d THEN $%d", i*2+1, i*2+2)
+		args = append(args, item.ID, item.NameEn)
+		ids = append(ids, fmt.Sprintf("$%d", i*2+1))
+	}
+
+	query += " END WHERE id IN (" + strings.Join(ids, ",") + ")"
+
+	_, err := r.db.Exec(query, args...)
+	return err
 }
 

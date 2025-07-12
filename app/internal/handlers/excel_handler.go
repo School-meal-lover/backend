@@ -37,11 +37,40 @@ func NewExcelHandler(excelService *services.ExcelService) *ExcelHandler {
 func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
 		var files [2]*multipart.FileHeader
     var err error
+		if err := os.MkdirAll("uploads", 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   "failed to create uploads directory",	
+			})
+			return
+		}
 
 		files[0], err = c.FormFile("excel_ko")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "Korean Excel file is missing",
+			})
+			return
+		}
+		
 		files[1], err = c.FormFile("excel_en")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"error":   "English Excel file is missing",
+			})
+			return
+		}
+
 
 		var fileKoPath, fileEnPath string
+		var savedFiles []string
+		defer func() {
+			for _, path := range savedFiles {
+				os.Remove(path)
+			}
+		}()
     for i,file:= range files[:2]{
 			if file == nil {
 				c.JSON(http.StatusBadRequest, gin.H{
@@ -67,6 +96,7 @@ func (h *ExcelHandler) UploadAndProcessExcel(c *gin.Context) {
 				})
 				return
 			}
+			savedFiles = append(savedFiles, savePath)
 			if i == 0 {
             fileKoPath = savePath
         } else {

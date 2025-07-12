@@ -92,25 +92,26 @@ func (s *ExcelService) ProcessEnglishExcelFile(filePath string, weekID string) (
 	}
 	defer f.Close()
 
-	sheetName,err := s.parser.GetFirstNonEmptySheet(f)
+	sheetName, err := s.parser.GetFirstNonEmptySheet(f)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get first non-empty sheet: %w", err)
 	}
 	dates, err := s.parser.BuildDatesFromExcel(f, sheetName)
 	if err != nil {
-			return nil, fmt.Errorf("failed to build dates: %w", err)
+		return nil, fmt.Errorf("failed to build dates: %w", err)
 	}
 
 	mealTypes := s.getMealTypeConfigs()
-	updatedCount := 0
+	var updateItems []models.MenuItem
 
 	for _, mealType := range mealTypes {
-		for _, dateInfo := range dates{
+		for _, dateInfo := range dates {
 			mealID, err := s.mealRepo.GetMealIDByWeekDateAndType(weekID, dateInfo.Date, mealType.MealType)
 			if err != nil {
 				log.Printf("Meal not found for %s %s: %v", dateInfo.Date, mealType.MealType, err)
 				continue
 			}
+
 			englishNames, err := s.parser.ReadMenuItems(f, dateInfo.Col, mealType.StartRow, mealType.EndRow)
 			if err != nil {
 				log.Printf("Failed to read English menu items for %s %s: %v", dateInfo.Date, mealType.MealType, err)
@@ -119,28 +120,34 @@ func (s *ExcelService) ProcessEnglishExcelFile(filePath string, weekID string) (
 			if len(englishNames) == 0 {
 				continue
 			}
+
 			koreanMenuItems, err := s.mealRepo.GetMenuItemsByMealIDOrdered(mealID)
 			if err != nil {
-					log.Printf("Failed to fetch Korean menu items for mealID %s: %v", mealID, err)
-					continue
+				log.Printf("Failed to fetch Korean menu items for mealID %s: %v", mealID, err)
+				continue
 			}
+
 			minLen := min(len(englishNames), len(koreanMenuItems))
 			for i := 0; i < minLen; i++ {
-					err := s.mealRepo.UpdateMenuItemNameEn(koreanMenuItems[i].ID, englishNames[i])
-					if err != nil {
-							log.Printf("Failed to update NameEn for menu item %s: %v", koreanMenuItems[i].ID, err)
-							continue
-					}
-					updatedCount++
+				updateItems = append(updateItems, models.MenuItem{
+					ID:     koreanMenuItems[i].ID,
+					NameEn: englishNames[i],
+				})
 			}
 		}
 	}
+
+	if err := s.mealRepo.UpdateMenuItemsEnglishNameBatch(updateItems); err != nil {
+		return nil, fmt.Errorf("failed to batch update NameEn: %w", err)
+	}
+
 	return &models.ExcelProcessResult{
-        Success:        true,
-				WeekID:         weekID,
-        Message:        "English Excel file processed successfully",
-    }, nil
+		Success: true,
+		WeekID:  weekID,
+		Message: "English Excel file processed successfully",
+	}, nil
 }
+
 // 식사 및 메뉴 처리 (비즈니스 로직)
 func (s *ExcelService) processMealsAndMenus(f *excel.ExcelFile, weekID string, dates []models.DateInfo) (int, int, error) {
     mealTypes := s.getMealTypeConfigs()
