@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  handlers.DualExcelProcessResponse:
+    properties:
+      result_en:
+        $ref: '#/definitions/models.ExcelProcessResult'
+      result_ko:
+        $ref: '#/definitions/models.ExcelProcessResult'
+      success:
+        type: boolean
+    type: object
   models.DayMeals:
     properties:
       date:
@@ -32,6 +41,8 @@ definitions:
         type: integer
       total_menu_items:
         type: integer
+      week_id:
+        type: string
       week_start_date:
         type: string
     type: object
@@ -170,16 +181,21 @@ paths:
       - multipart/form-data
       description: 파일을 업로드 해서 식단 데이터를 디비에 저장한다.
       parameters:
-      - description: 업로드할 엑셀 파일 (.xlsx 또는 .xls)
+      - description: 한국어 엑셀 파일
         in: formData
-        name: excel
+        name: excel_ko
+        required: true
+        type: file
+      - description: 영어 엑셀 파일
+        in: formData
+        name: excel_en
         required: true
         type: file
       responses:
         "200":
           description: Excel file processed successfully
           schema:
-            $ref: '#/definitions/models.ExcelProcessResult'
+            $ref: '#/definitions/handlers.DualExcelProcessResponse'
         "500":
           description: Failed to process Excel file
           schema:

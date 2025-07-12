@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/School-meal-lover/backend/app/internal/models"
@@ -251,3 +252,68 @@ func (r *MealRepository) GetMealsData(weekID string) ([]*models.DayMeals, *model
 
 	return orderedDays, summary, nil
 }
+
+func (r *MealRepository) GetMealIDByWeekDateAndType(weekID, date, mealType string) (string, error) {
+    var mealID string
+    query := `
+        SELECT id FROM meals 
+        WHERE weeks_id = $1 AND date = $2 AND meal_type = $3
+        LIMIT 1
+    `
+    err := r.db.QueryRow(query, weekID, date, mealType).Scan(&mealID)
+    return mealID, err
+}
+
+func (r *MealRepository) GetMenuItemsByMealIDOrdered(mealID string) ([]models.MenuItem, error) {
+    query := `
+        SELECT id, meals_id, category, name, name_en, price
+        FROM menu_items
+        WHERE meals_id = $1
+        ORDER BY id ASC
+    `
+    rows, err := r.db.Query(query, mealID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var items []models.MenuItem
+    for rows.Next() {
+        var item models.MenuItem
+        if err := rows.Scan(&item.ID, &item.MealID, &item.Category, &item.Name, &item.NameEn, &item.Price); err != nil {
+            return nil, err
+        }
+        items = append(items, item)
+    }
+    return items, nil
+}
+
+func (r *MealRepository) UpdateMenuItemNameEn(menuItemID, nameEn string) error {
+    _, err := r.db.Exec(`
+        UPDATE menu_items
+        SET name_en = $1
+        WHERE id = $2
+    `, nameEn, menuItemID)
+    return err
+}
+func (r *MealRepository) UpdateMenuItemsEnglishNameBatch(items []models.MenuItem) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	query := "UPDATE menu_items SET name_en = CASE id"
+	var ids []string
+	args := []interface{}{}
+
+	for i, item := range items {
+		query += fmt.Sprintf(" WHEN $%d THEN $%d", i*2+1, i*2+2)
+		args = append(args, item.ID, item.NameEn)
+		ids = append(ids, fmt.Sprintf("$%d", i*2+1))
+	}
+
+	query += " END WHERE id IN (" + strings.Join(ids, ",") + ")"
+
+	_, err := r.db.Exec(query, args...)
+	return err
+}
+
