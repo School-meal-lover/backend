@@ -99,8 +99,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "업로드할 엑셀 파일 (.xlsx 또는 .xls)",
-                        "name": "excel",
+                        "description": "한국어 엑셀 파일",
+                        "name": "excel_ko",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "영어 엑셀 파일",
+                        "name": "excel_en",
                         "in": "formData",
                         "required": true
                     }
@@ -109,7 +116,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Excel file processed successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.ExcelProcessResult"
+                            "$ref": "#/definitions/handlers.DualExcelProcessResponse"
                         }
                     },
                     "500": {
@@ -123,6 +130,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.DualExcelProcessResponse": {
+            "type": "object",
+            "properties": {
+                "result_en": {
+                    "$ref": "#/definitions/models.ExcelProcessResult"
+                },
+                "result_ko": {
+                    "$ref": "#/definitions/models.ExcelProcessResult"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "models.DayMeals": {
             "type": "object",
             "properties": {
@@ -170,6 +191,9 @@ const docTemplate = `{
                 },
                 "total_menu_items": {
                     "type": "integer"
+                },
+                "week_id": {
+                    "type": "string"
                 },
                 "week_start_date": {
                     "type": "string"
