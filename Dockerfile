@@ -43,7 +43,7 @@ COPY --from=builder /build/migrations ./migrations/
 RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
 
 USER appuser
-  
+
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh", "-c", "/app/migrate -path /app/migrations -database \"${DATABASE_URL}\" up && /app/server"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/migrate -path /app/migrations -database 'postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable' up && /app/server"]
