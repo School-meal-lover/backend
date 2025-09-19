@@ -14,7 +14,7 @@ import (
 
 // @title Grrrrr API
 // @version 1.0
-// @host localhost:8080
+// @host https://api.grrrr.me
 // @description The server for Grrrrr application.
 // @BasePath /api/v1
 // @schemes http
