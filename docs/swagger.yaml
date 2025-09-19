@@ -121,7 +121,7 @@ definitions:
       start_date:
         type: string
     type: object
-host: https://api.grrrr.me
+host: api.grrrr.me
 info:
   contact: {}
   description: The server for Grrrrr application.
