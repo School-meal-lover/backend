@@ -34,5 +34,5 @@ USER appuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh", "-c", "migrate -path ./migrations -database \"postgress://$DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable\" up && ./server"]
+ENTRYPOINT ["/bin/sh", "-c", "migrate -path ./migrations -database \"postgres://$DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable\" up && ./server"]
 
