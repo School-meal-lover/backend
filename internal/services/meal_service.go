@@ -3,8 +3,8 @@ package services
 import (
 	"time"
 
-	"github.com/School-meal-lover/backend/app/internal/models"
-	"github.com/School-meal-lover/backend/app/internal/repository"
+	"github.com/School-meal-lover/backend/internal/models"
+	"github.com/School-meal-lover/backend/internal/repository"
 )
 
 type MealService struct {
@@ -12,13 +12,23 @@ type MealService struct {
 }
 
 func NewMealService(mealRepo *repository.MealRepository) *MealService {
-    return &MealService{
-        mealRepo: mealRepo,
-    }
+	return &MealService{
+		mealRepo: mealRepo,
+	}
 }
+
 // 특정 레스토랑의 주간 식단을 조회
-func (s *MealService) GetRestaurantWeekMeals(restaurantID, date string) (*models.RestaurantMealsResponse, error) {
+func (s *MealService) GetRestaurantWeekMeals(restaurantNameParam string, date string) (*models.RestaurantMealsResponse, error) {
 	// 날짜 형식 검증
+	var restaurantType models.RestaurantType
+	switch restaurantNameParam {
+	case string(models.Restaurant1):
+		restaurantType = models.Restaurant1
+	case string(models.Restaurant2):
+		restaurantType = models.Restaurant2
+	default:
+		return &models.RestaurantMealsResponse{Success: false, Error: "Invalid restaurant name", Code: "INVALID_RESTAURANR_NAME"}, nil
+	}
 	if _, err := time.Parse("2006-01-02", date); err != nil {
 		return &models.RestaurantMealsResponse{
 			Success: false,
@@ -26,17 +36,14 @@ func (s *MealService) GetRestaurantWeekMeals(restaurantID, date string) (*models
 			Code:    "INVALID_DATE_FORMAT",
 		}, nil
 	}
-
-	// 레스토랑 정보 조회 및 에러 처리
-	restaurant, err := s.mealRepo.GetRestaurantInfo(restaurantID)
-	if err != nil {
-		return s.mealRepo.HandleRepositoryError(err, "RESTAURANT_NOT_FOUND", "Restaurant not found")
-	}
-
 	// 주차 정보 조회 및 에러 처리
-	week, err := s.mealRepo.GetWeekInfo(restaurantID, date)
+	week, err := s.mealRepo.GetWeekInfo(restaurantType, date)
 	if err != nil {
-		return s.mealRepo.HandleRepositoryError(err, "WEEK_DATA_NOT_FOUND", "No meal data found for the specified week")
+		return &models.RestaurantMealsResponse{
+			Success: false,
+			Error:   "WEEK_DATA_NOT_FOUND",
+			Code:    "No meal data found for the specified week",
+		}, nil
 	}
 
 	// 식단 데이터 조회 및 에러 처리
@@ -52,7 +59,7 @@ func (s *MealService) GetRestaurantWeekMeals(restaurantID, date string) (*models
 
 	// 성공 응답 구성
 	response := &models.RestaurantMealsData{
-		Restaurant: restaurant,
+		Restaurant: string(restaurantType),
 		Week:       week,
 		MealsByDay: orderedmealsByDay,
 		Summary:    summary,

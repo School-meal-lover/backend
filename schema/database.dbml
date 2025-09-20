@@ -2,18 +2,15 @@ Project grrr_db {
   database_type: "PostgreSQL"
 }
 
-Table restaurants {
-  id uuid [pk, unique, default: `gen_random_uuid()`]
-  name varchar [not null]
-  name_en varchar
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Enum restaurant_type {
+  RESTAURANT_1
+  RESTAURANT_2
 }
 
 Table weeks {
   id uuid [pk, unique, default: `gen_random_uuid()`]
   start_date date [not null]
-  restaurants_id uuid [ref: > restaurants.id]
+  restaurant restaurant_type [not null]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
@@ -34,7 +31,6 @@ Table menu_items {
   category varchar [not null, note: '밥, 국, 메인메뉴, 반찬']
   name varchar
   name_en varchar
-  price decimal(10,2)
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 }
