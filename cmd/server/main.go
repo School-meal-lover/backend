@@ -1,12 +1,14 @@
 package main
 
 import (
-	"github.com/School-meal-lover/backend/app/internal/database"
-	"github.com/School-meal-lover/backend/app/internal/handlers"
-	"github.com/School-meal-lover/backend/app/internal/repository"
-	"github.com/School-meal-lover/backend/app/internal/services"
+	"log"
 
-	_ "github.com/School-meal-lover/backend/docs" // Swagger 문서
+	"github.com/School-meal-lover/backend/internal/database"
+	"github.com/School-meal-lover/backend/internal/handlers"
+	"github.com/School-meal-lover/backend/internal/repository"
+	"github.com/School-meal-lover/backend/internal/services"
+	"github.com/joho/godotenv"
+
 	gin "github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -19,6 +21,10 @@ import (
 // @BasePath /api/v1
 // @schemes http
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	router := gin.Default()
 
 	// DB 연결
@@ -53,11 +59,9 @@ func main() {
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
-		api.GET("/restaurants/:id", mealHandler.GetRestaurantMeals)
+		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
 
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
-
-		api.GET("/process/excel/local", excelHandler.ProcessLocalExcel) // 개발용
 	}
 	// Set up Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -9,9 +9,9 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func main(){
+func main() {
 	databaseURL := os.Getenv("DATABASE_URL")
-  if databaseURL == "" {
+	if databaseURL == "" {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
 
@@ -38,7 +38,7 @@ func main(){
 			log.Printf("Warning: Failed to close migration instance: source=%v, db=%v", sourceErr, dbErr)
 		}
 	}()
-	
+
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNoChange {
 		log.Printf("Warning: Could not get migration version: %v", err)
