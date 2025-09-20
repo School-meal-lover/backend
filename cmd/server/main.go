@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	docs "github.com/School-meal-lover/backend/docs"
 	"github.com/School-meal-lover/backend/internal/database"
 	"github.com/School-meal-lover/backend/internal/handlers"
 	"github.com/School-meal-lover/backend/internal/repository"
@@ -26,7 +27,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	router := gin.Default()
-
+	docs.SwaggerInfo.BasePath = "/api/v1"
 	// DB 연결
 	database.ConnectDatabase()
 	db := database.Db
