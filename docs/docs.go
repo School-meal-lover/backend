@@ -15,32 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/process/excel/local": {
+        "/restaurants/{name}": {
             "get": {
-                "description": "서버 내부에 하드코딩된 엑셀 파일 경로를 사용하여 식단 데이터를 파싱하고 DB에 저장합니다.",
-                "tags": [
-                    "excel"
-                ],
-                "summary": "로컬 엑셀 파일 처리 (개발용)",
-                "responses": {
-                    "200": {
-                        "description": "Excel file processed successfully.",
-                        "schema": {
-                            "$ref": "#/definitions/models.ExcelProcessResult"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to process Excel file",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/restaurants/{id}": {
-            "get": {
-                "description": "Retrieve meals for a restaurant on a given date",
+                "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -50,12 +27,12 @@ const docTemplate = `{
                 "tags": [
                     "Meals"
                 ],
-                "summary": "Get meals for a specific restaurant on a specific date",
+                "summary": "특정 식당의 주간 식단 조회",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "레스토랑 ID (UUID 형식)",
-                        "name": "id",
+                        "description": "레스토랑 이름 (e.g., restaurant_1, restaurant_2)",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     },
@@ -75,13 +52,22 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "잘못된 요청 파라미터 (ID 또는 날짜 형식 오류)"
+                        "description": "잘못된 요청 파라미터 (식당 이름 또는 날짜 형식 오류)",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
                     },
                     "404": {
-                        "description": "레스토랑 또는 해당 날짜의 식단 정보를 찾을 수 없음"
+                        "description": "해당 식당 또는 해당 날짜의 식단 정보를 찾을 수 없음",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
                     },
                     "500": {
-                        "description": "서버 내부 오류 발생"
+                        "description": "서버 내부 오류 발생",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -180,7 +166,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "restaurant_name": {
+                "restaurant_type": {
                     "type": "string"
                 },
                 "success": {
@@ -251,20 +237,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RestaurantInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "name_en": {
-                    "type": "string"
-                }
-            }
-        },
         "models.RestaurantMealsData": {
             "type": "object",
             "properties": {
@@ -275,7 +247,7 @@ const docTemplate = `{
                     }
                 },
                 "restaurant": {
-                    "$ref": "#/definitions/models.RestaurantInfo"
+                    "type": "string"
                 },
                 "summary": {
                     "$ref": "#/definitions/models.MealsSummary"
