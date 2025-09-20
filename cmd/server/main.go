@@ -24,7 +24,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found; continuing with environment variables")
 	}
 	router := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api/v1"
