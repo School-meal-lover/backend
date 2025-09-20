@@ -153,7 +153,7 @@ func (r *MealRepository) GetWeekInfo(restaurant models.RestaurantType, date stri
 	query := `
 		SELECT id, start_date
         FROM weeks 
-        WHERE restaurants = $1 
+        WHERE restaurant = $1 
         AND $2 >= start_date 
         AND $2 <= start_date + INTERVAL '6 days'
         ORDER BY start_date DESC
