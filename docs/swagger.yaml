@@ -186,5 +186,5 @@ paths:
       tags:
       - excel
 schemes:
-- http
+- https
 swagger: "2.0"
