@@ -20,7 +20,7 @@ import (
 // @host api.grrrr.me
 // @description The server for Grrrrr application.
 // @BasePath /api/v1
-// @schemes http
+// @schemes https
 func main() {
 	err := godotenv.Load()
 	if err != nil {
