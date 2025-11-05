@@ -60,11 +60,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "업로드할 이미지 이름",
-                        "name": "image_name",
+                        "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ImageUploadRequest"
                         }
                     }
                 ],
@@ -266,6 +266,17 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "models.ImageUploadRequest": {
+            "type": "object",
+            "required": [
+                "image_name"
+            ],
+            "properties": {
+                "image_name": {
+                    "type": "string"
                 }
             }
         },

@@ -55,6 +55,13 @@ definitions:
       success:
         type: boolean
     type: object
+  models.ImageUploadRequest:
+    properties:
+      image_name:
+        type: string
+    required:
+    - image_name
+    type: object
   models.MealInfo:
     properties:
       meal_id:
@@ -155,10 +162,10 @@ paths:
       parameters:
       - description: 업로드할 이미지 이름
         in: body
-        name: image_name
+        name: data
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/models.ImageUploadRequest'
       produces:
       - application/json
       responses:
