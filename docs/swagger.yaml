@@ -152,6 +152,13 @@ paths:
       consumes:
       - application/json
       description: 이미지 이름을 업로드합니다.
+      parameters:
+      - description: 업로드할 이미지 이름
+        in: body
+        name: image_name
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:

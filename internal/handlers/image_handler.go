@@ -20,11 +20,19 @@ func NewImageHandler(imageService *services.ImageService) *ImageHandler {
 // @Tags         Images
 // @Accept	   json
 // @Produce      json
+// @Param  image_name body string true "업로드할 이미지 이름"
 // @Success      200 {object} models.ImageInfoResponse "성공적으로 이미지 이름 업로드"
 // @Failure      500 {object} models.ErrorResponse "서버 내부 오류 발생"
 // @Router       /images/upload [post]
 func (h *ImageHandler) UploadImageName(c *gin.Context) {
-	imageName := c.PostForm("image_name")
+	var requestBody struct {
+		ImageName string `json:"image_name" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	imageName := requestBody.ImageName
 	response, err := h.imageService.UploadImageName(imageName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

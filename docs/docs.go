@@ -57,6 +57,17 @@ const docTemplate = `{
                     "Images"
                 ],
                 "summary": "이미지 이름 업로드",
+                "parameters": [
+                    {
+                        "description": "업로드할 이미지 이름",
+                        "name": "image_name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "성공적으로 이미지 이름 업로드",
