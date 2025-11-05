@@ -45,7 +45,7 @@ func (h *ImageHandler) UploadImageName(c *gin.Context) {
 	}
 
 	imageName := requestBody.ImageName
-	response, err := h.imageService.UploadImageName(imageName, restaurantNumber)
+	response, err := h.imageService.UploadImageName(imageName, restaurantNumber-1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -74,7 +74,7 @@ func (h *ImageHandler) GetCurrentImageName(c *gin.Context) {
 		return
 	}
 
-	response, err := h.imageService.GetCurrentImageName(restaurantNumber)
+	response, err := h.imageService.GetCurrentImageName(restaurantNumber - 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
