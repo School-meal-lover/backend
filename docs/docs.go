@@ -28,6 +28,20 @@ const docTemplate = `{
                     "Images"
                 ],
                 "summary": "현재 이미지 이름 조회",
+                "parameters": [
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "type": "integer",
+                        "description": "레스토랑 번호",
+                        "name": "restaurant_name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "성공적으로 현재 이미지 이름 조회",
@@ -58,6 +72,18 @@ const docTemplate = `{
                 ],
                 "summary": "이미지 이름 업로드",
                 "parameters": [
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "type": "integer",
+                        "description": "레스토랑 번호",
+                        "name": "restaurant_name",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "description": "업로드할 이미지 이름",
                         "name": "data",

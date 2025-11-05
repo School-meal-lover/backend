@@ -7,32 +7,32 @@ import (
 )
 
 type ImageService struct {
-	current_image_name string
-	current_image_date time.Time
+	current_image_name [3]string
+	current_image_date [3]time.Time
 }
 
 func NewImageService() *ImageService {
 	return &ImageService{
-		current_image_name: "",
-		current_image_date: time.Time{},
+		current_image_name: [3]string{"", "", ""},
+		current_image_date: [3]time.Time{},
 	}
 }
 
 // 이미지 이름 업로드 및 저장
-func (s *ImageService) UploadImageName(imageName string) (*models.ImageInfoResponse, error) {
-	s.current_image_name = imageName
-	s.current_image_date = time.Now()
+func (s *ImageService) UploadImageName(imageName string, restaurant_num int) (*models.ImageInfoResponse, error) {
+	s.current_image_name[restaurant_num] = imageName
+	s.current_image_date[restaurant_num] = time.Now()
 	return &models.ImageInfoResponse{
 		Success:   true,
-		ImageName: imageName,
-		ImageDate: s.current_image_date.Format("2006-01-02 15:04:05"),
+		ImageName: s.current_image_name[restaurant_num],
+		ImageDate: s.current_image_date[restaurant_num].Format("2006-01-02 15:04:05"),
 	}, nil
 }
 
-func (s *ImageService) GetCurrentImageName() (*models.ImageInfoResponse, error) {
+func (s *ImageService) GetCurrentImageName(restaurant_num int) (*models.ImageInfoResponse, error) {
 	return &models.ImageInfoResponse{
 		Success:   true,
-		ImageName: s.current_image_name,
-		ImageDate: s.current_image_date.Format("2006-01-02 15:04:05"),
+		ImageName: s.current_image_name[restaurant_num],
+		ImageDate: s.current_image_date[restaurant_num].Format("2006-01-02 15:04:05"),
 	}, nil
 }

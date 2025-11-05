@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/School-meal-lover/backend/internal/models"
 	"github.com/School-meal-lover/backend/internal/services"
@@ -21,6 +22,7 @@ func NewImageHandler(imageService *services.ImageService) *ImageHandler {
 // @Tags         Images
 // @Accept	   json
 // @Produce      json
+// @Param restaurant_name query int true "레스토랑 번호" Enums(1, 2, 3)
 // @Param  data body models.ImageUploadRequest true "업로드할 이미지 이름"
 // @Success      200 {object} models.ImageInfoResponse "성공적으로 이미지 이름 업로드"
 // @Failure      500 {object} models.ErrorResponse "서버 내부 오류 발생"
@@ -31,8 +33,19 @@ func (h *ImageHandler) UploadImageName(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	restaurantNumberString := c.Query("restaurant_name")
+	if restaurantNumberString == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "restaurant_name query parameter is required"})
+		return
+	}
+	restaurantNumber, err := strconv.Atoi(restaurantNumberString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant_name query parameter"})
+		return
+	}
+
 	imageName := requestBody.ImageName
-	response, err := h.imageService.UploadImageName(imageName)
+	response, err := h.imageService.UploadImageName(imageName, restaurantNumber)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -45,11 +58,23 @@ func (h *ImageHandler) UploadImageName(c *gin.Context) {
 // @Tags         Images
 // @Accept	   json
 // @Produce      json
+// @Param restaurant_name query int true "레스토랑 번호" Enums(1, 2, 3)
 // @Success      200 {object} models.ImageInfoResponse "성공적으로 현재 이미지 이름 조회"
 // @Failure      500 {object} models.ErrorResponse "서버 내부 오류 발생"
 // @Router       /images/current [get]
 func (h *ImageHandler) GetCurrentImageName(c *gin.Context) {
-	response, err := h.imageService.GetCurrentImageName()
+	restaurantNumberString := c.Query("restaurant_name")
+	if restaurantNumberString == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "restaurant_name query parameter is required"})
+		return
+	}
+	restaurantNumber, err := strconv.Atoi(restaurantNumberString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant_name query parameter"})
+		return
+	}
+
+	response, err := h.imageService.GetCurrentImageName(restaurantNumber)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

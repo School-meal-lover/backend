@@ -140,6 +140,16 @@ paths:
       consumes:
       - application/json
       description: 현재 저장된 이미지 이름을 조회합니다.
+      parameters:
+      - description: 레스토랑 번호
+        enum:
+        - 1
+        - 2
+        - 3
+        in: query
+        name: restaurant_name
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -160,6 +170,15 @@ paths:
       - application/json
       description: 이미지 이름을 업로드합니다.
       parameters:
+      - description: 레스토랑 번호
+        enum:
+        - 1
+        - 2
+        - 3
+        in: query
+        name: restaurant_name
+        required: true
+        type: integer
       - description: 업로드할 이미지 이름
         in: body
         name: data
