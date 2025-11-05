@@ -10,6 +10,12 @@ type ExcelProcessResult struct {
 	Message        string `json:"message"`
 }
 
+type ImageInfoResponse struct {
+	Success   bool   `json:"success"`
+	ImageName string `json:"image_name,omitempty"`
+	ImageDate string `json:"image_date,omitempty"`
+}
+
 type RestaurantMealsResponse struct {
 	Success bool                 `json:"success"`
 	Data    *RestaurantMealsData `json:"data,omitempty"`
