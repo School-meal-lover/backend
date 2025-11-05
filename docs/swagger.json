@@ -12,6 +12,64 @@
     "host": "api.grrrr.me",
     "basePath": "/api/v1",
     "paths": {
+        "/images/current": {
+            "get": {
+                "description": "현재 저장된 이미지 이름을 조회합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Images"
+                ],
+                "summary": "현재 이미지 이름 조회",
+                "responses": {
+                    "200": {
+                        "description": "성공적으로 현재 이미지 이름 조회",
+                        "schema": {
+                            "$ref": "#/definitions/models.ImageInfoResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "서버 내부 오류 발생",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/images/upload": {
+            "post": {
+                "description": "이미지 이름을 업로드합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Images"
+                ],
+                "summary": "이미지 이름 업로드",
+                "responses": {
+                    "200": {
+                        "description": "성공적으로 이미지 이름 업로드",
+                        "schema": {
+                            "$ref": "#/definitions/models.ImageInfoResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "서버 내부 오류 발생",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/restaurants/{name}": {
             "get": {
                 "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다.",
@@ -180,6 +238,20 @@
                 },
                 "week_start_date": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ImageInfoResponse": {
+            "type": "object",
+            "properties": {
+                "image_date": {
+                    "type": "string"
+                },
+                "image_name": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

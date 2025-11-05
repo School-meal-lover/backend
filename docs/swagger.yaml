@@ -46,6 +46,15 @@ definitions:
       week_start_date:
         type: string
     type: object
+  models.ImageInfoResponse:
+    properties:
+      image_date:
+        type: string
+      image_name:
+        type: string
+      success:
+        type: boolean
+    type: object
   models.MealInfo:
     properties:
       meal_id:
@@ -119,6 +128,44 @@ info:
   title: Grrrrr API
   version: "1.0"
 paths:
+  /images/current:
+    get:
+      consumes:
+      - application/json
+      description: 현재 저장된 이미지 이름을 조회합니다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 성공적으로 현재 이미지 이름 조회
+          schema:
+            $ref: '#/definitions/models.ImageInfoResponse'
+        "500":
+          description: 서버 내부 오류 발생
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 현재 이미지 이름 조회
+      tags:
+      - Images
+  /images/upload:
+    post:
+      consumes:
+      - application/json
+      description: 이미지 이름을 업로드합니다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 성공적으로 이미지 이름 업로드
+          schema:
+            $ref: '#/definitions/models.ImageInfoResponse'
+        "500":
+          description: 서버 내부 오류 발생
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: 이미지 이름 업로드
+      tags:
+      - Images
   /restaurants/{name}:
     get:
       consumes:
