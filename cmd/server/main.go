@@ -38,10 +38,12 @@ func main() {
 	// 서비스 초기화
 	mealService := services.NewMealService(mealRepo)
 	excelService := services.NewExcelService(mealRepo)
+	textService := services.NewTextService(mealRepo)
 
 	// 핸들러 초기화
 	mealHandler := handlers.NewMealHandler(mealService)
 	excelHandler := handlers.NewExcelHandler(excelService)
+	textHandler := handlers.NewTextHandler(textService)
 
 	// CORS 미들웨어
 	router.Use(func(c *gin.Context) {
@@ -63,6 +65,7 @@ func main() {
 		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
 
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
+		api.POST("/upload/text", textHandler.UploadAndProcessText)
 	}
 	// Set up Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
