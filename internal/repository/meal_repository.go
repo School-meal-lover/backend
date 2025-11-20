@@ -150,21 +150,34 @@ func (r *MealRepository) InsertMenuItems(menuItems []models.MenuItem) error {
 func (r *MealRepository) GetWeekInfo(restaurant models.RestaurantType, date string) (*models.WeekInfo, error) {
 	week := &models.WeekInfo{}
 	var startDate time.Time
-	query := `
+	
+	// 식당 타입에 따라 주말 포함 여부 결정
+	var dayInterval int
+	if restaurant == models.Restaurant1 {
+		// 식당 1: 월화수목금 (5일) - start_date + 4일
+		dayInterval = 4
+	} else if restaurant == models.Restaurant2 {
+		// 식당 2: 월화수목금토일 (7일) - start_date + 6일
+		dayInterval = 6
+	} else {
+		return nil, fmt.Errorf("unknown restaurant type: %s", restaurant)
+	}
+
+	query := fmt.Sprintf(`
 		SELECT id, start_date
         FROM weeks 
         WHERE restaurant = $1 
         AND $2 >= start_date 
-        AND $2 <= start_date + INTERVAL '6 days'
+        AND $2 <= start_date + INTERVAL '%d days'
         ORDER BY start_date DESC
-        LIMIT 1`
+        LIMIT 1`, dayInterval)
 
 	err := r.db.QueryRow(query, restaurant, date).Scan(&week.ID, &startDate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get week by date: %w", err)
 	}
 	week.StartDate = startDate.Format("2006-01-02")
-	week.EndDate = startDate.AddDate(0, 0, 6).Format("2006-01-02")
+	week.EndDate = startDate.AddDate(0, 0, dayInterval).Format("2006-01-02")
 
 	return week, nil
 }

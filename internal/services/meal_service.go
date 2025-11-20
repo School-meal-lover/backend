@@ -18,17 +18,8 @@ func NewMealService(mealRepo *repository.MealRepository) *MealService {
 }
 
 // 특정 레스토랑의 주간 식단을 조회
-func (s *MealService) GetRestaurantWeekMeals(restaurantNameParam string, date string) (*models.RestaurantMealsResponse, error) {
+func (s *MealService) GetRestaurantWeekMeals(restaurantType models.RestaurantType, date string) (*models.RestaurantMealsResponse, error) {
 	// 날짜 형식 검증
-	var restaurantType models.RestaurantType
-	switch restaurantNameParam {
-	case string(models.Restaurant1):
-		restaurantType = models.Restaurant1
-	case string(models.Restaurant2):
-		restaurantType = models.Restaurant2
-	default:
-		return &models.RestaurantMealsResponse{Success: false, Error: "Invalid restaurant name", Code: "INVALID_RESTAURANR_NAME"}, nil
-	}
 	if _, err := time.Parse("2006-01-02", date); err != nil {
 		return &models.RestaurantMealsResponse{
 			Success: false,

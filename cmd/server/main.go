@@ -38,12 +38,12 @@ func main() {
 	// 서비스 초기화
 	mealService := services.NewMealService(mealRepo)
 	excelService := services.NewExcelService(mealRepo)
-	imageService := services.NewImageService()
+	textService := services.NewTextService(mealRepo)
 
 	// 핸들러 초기화
 	mealHandler := handlers.NewMealHandler(mealService)
 	excelHandler := handlers.NewExcelHandler(excelService)
-	imageHandler := handlers.NewImageHandler(imageService)
+	textHandler := handlers.NewTextHandler(textService)
 
 	// CORS 미들웨어
 	router.Use(func(c *gin.Context) {
@@ -62,12 +62,14 @@ func main() {
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
+		// 새로운 RESTful 엔드포인트 (권장)
+		api.GET("/restaurants/:restaurant_type/meals", mealHandler.GetRestaurantMeals)
+		api.POST("/restaurants/:restaurant_type/upload/text", textHandler.UploadAndProcessText)
+		
+		// 기존 호환성 유지 (deprecated)
 		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
-
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
-
-		api.POST("/images/upload", imageHandler.UploadImageName)
-		api.GET("/images/current", imageHandler.GetCurrentImageName)
+		api.POST("/upload/text", textHandler.UploadAndProcessText)
 	}
 	// Set up Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
