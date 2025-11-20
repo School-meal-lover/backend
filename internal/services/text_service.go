@@ -8,6 +8,7 @@ import (
 
 	"github.com/School-meal-lover/backend/internal/models"
 	"github.com/School-meal-lover/backend/internal/repository"
+	"github.com/School-meal-lover/backend/internal/utils"
 )
 
 type TextService struct {
@@ -18,6 +19,50 @@ func NewTextService(mealRepo *repository.MealRepository) *TextService {
 	return &TextService{
 		mealRepo: mealRepo,
 	}
+}
+
+// ParseRestaurantTypeFromText 텍스트에서 식당 타입만 파싱 (공개 메서드)
+func (s *TextService) ParseRestaurantTypeFromText(text string) (models.RestaurantType, error) {
+	return s.parseRestaurantType(text)
+}
+
+// ProcessTextDataWithRestaurantType 식당 타입을 받아서 텍스트 데이터 처리
+func (s *TextService) ProcessTextDataWithRestaurantType(text string, restaurantType models.RestaurantType) (*models.ExcelProcessResult, error) {
+	log.Printf("Starting to process text data with restaurant type: %s", restaurantType)
+
+	// 1. 주 시작일 파싱
+	weekStartDate, err := s.parseWeekStartDate(text)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse week start date: %w", err)
+	}
+
+	// 2. 주차 정보 생성
+	weekID, err := s.mealRepo.FindOrCreateWeek(weekStartDate, restaurantType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert week: %w", err)
+	}
+
+	// 3. 날짜 정보 구성 (식당 타입에 따라 요일 수가 다름)
+	dates, err := s.buildDatesFromText(weekStartDate, restaurantType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build dates: %w", err)
+	}
+
+	// 4. 식사 및 메뉴 데이터 처리
+	totalMeals, totalMenuItems, err := s.processMealsAndMenusFromText(text, weekID, dates)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process meals and menus: %w", err)
+	}
+
+	return &models.ExcelProcessResult{
+		Success:        true,
+		RestaurantType: string(restaurantType),
+		WeekStartDate:  weekStartDate.Format("2006-01-02"),
+		WeekID:         weekID,
+		TotalMeals:     totalMeals,
+		TotalMenuItems: totalMenuItems,
+		Message:        "Text data processed successfully",
+	}, nil
 }
 
 // Plain text로 한 주치 식단 데이터 처리
@@ -65,20 +110,14 @@ func (s *TextService) ProcessTextData(text string) (*models.ExcelProcessResult, 
 	}, nil
 }
 
-// 텍스트에서 식당 타입 파싱
+// 텍스트에서 식당 타입 파싱 (utils 사용)
 func (s *TextService) parseRestaurantType(text string) (models.RestaurantType, error) {
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "식당:") {
 			restaurantStr := strings.TrimSpace(strings.TrimPrefix(line, "식당:"))
-			restaurantStr = strings.ToUpper(restaurantStr)
-			if strings.Contains(restaurantStr, "1") || restaurantStr == "RESTAURANT_1" {
-				return models.Restaurant1, nil
-			}
-			if strings.Contains(restaurantStr, "2") || restaurantStr == "RESTAURANT_2" {
-				return models.Restaurant2, nil
-			}
+			return utils.ParseRestaurantType(restaurantStr)
 		}
 	}
 	return "", fmt.Errorf("restaurant type not found in text")
@@ -107,17 +146,18 @@ func (s *TextService) buildDatesFromText(weekStartDate time.Time, restaurantType
 	var dayNames []string
 	var dayCount int
 
-	// 식당 타입에 따라 요일 수 결정
+	// 식당 타입에 따라 요일 수 결정 (utils 사용)
+	dayCount, err := utils.GetDaysForRestaurant(restaurantType)
+	if err != nil {
+		return nil, fmt.Errorf("invalid restaurant type: %w", err)
+	}
+
 	if restaurantType == models.Restaurant1 {
 		// 식당 1: 월화수목금 (5일)
 		dayNames = []string{"월요일", "화요일", "수요일", "목요일", "금요일"}
-		dayCount = 5
-	} else if restaurantType == models.Restaurant2 {
+	} else {
 		// 식당 2: 월화수목금토일 (7일)
 		dayNames = []string{"월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"}
-		dayCount = 7
-	} else {
-		return nil, fmt.Errorf("unknown restaurant type: %s", restaurantType)
 	}
 
 	for i := 0; i < dayCount; i++ {

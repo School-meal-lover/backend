@@ -62,8 +62,12 @@ func main() {
 	// API 라우트
 	api := router.Group("/api/v1")
 	{
+		// 새로운 RESTful 엔드포인트 (권장)
+		api.GET("/restaurants/:restaurant_type/meals", mealHandler.GetRestaurantMeals)
+		api.POST("/restaurants/:restaurant_type/upload/text", textHandler.UploadAndProcessText)
+		
+		// 기존 호환성 유지 (deprecated)
 		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
-
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
 		api.POST("/upload/text", textHandler.UploadAndProcessText)
 	}
