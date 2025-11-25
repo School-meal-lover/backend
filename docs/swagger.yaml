@@ -266,6 +266,48 @@ paths:
       summary: 엑셀 처리 API
       tags:
       - excel
+  /upload/text:
+    post:
+      consumes:
+      - text/plain
+      description: plain text로 한 주치 식단 데이터를 받아서 디비에 저장합니다. Bearer token 인증이 필요합니다.
+      parameters:
+      - description: 식단 텍스트 데이터
+        in: body
+        name: text
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Text processed successfully
+          schema:
+            $ref: '#/definitions/models.ExcelProcessResult'
+        "400":
+          description: Invalid request body or format
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to process text
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 텍스트로 식단 데이터 업로드
+      tags:
+      - text
 schemes:
 - https
+securityDefinitions:
+  BearerAuth:
+    description: 'Bearer token 인증. 형식: "Bearer gistsikdang"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

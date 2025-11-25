@@ -6,6 +6,7 @@ import (
 	docs "github.com/School-meal-lover/backend/docs"
 	"github.com/School-meal-lover/backend/internal/database"
 	"github.com/School-meal-lover/backend/internal/handlers"
+	"github.com/School-meal-lover/backend/internal/middleware"
 	"github.com/School-meal-lover/backend/internal/repository"
 	"github.com/School-meal-lover/backend/internal/services"
 	"github.com/joho/godotenv"
@@ -21,6 +22,10 @@ import (
 // @description The server for Grrrrr application.
 // @BasePath /api/v1
 // @schemes https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Bearer token 인증. 형식: "Bearer gistsikdang"
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -38,11 +43,13 @@ func main() {
 	// 서비스 초기화
 	mealService := services.NewMealService(mealRepo)
 	excelService := services.NewExcelService(mealRepo)
+	textService := services.NewTextService(mealRepo)
 	imageService := services.NewImageService()
 
 	// 핸들러 초기화
 	mealHandler := handlers.NewMealHandler(mealService)
 	excelHandler := handlers.NewExcelHandler(excelService)
+	textHandler := handlers.NewTextHandler(textService)
 	imageHandler := handlers.NewImageHandler(imageService)
 
 	// CORS 미들웨어
@@ -65,6 +72,9 @@ func main() {
 		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
 
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
+
+		// Bearer token 인증이 필요한 엔드포인트
+		api.POST("/upload/text", middleware.BearerTokenAuth(), textHandler.UploadText)
 
 		api.POST("/images/upload", imageHandler.UploadImageName)
 		api.GET("/images/current", imageHandler.GetCurrentImageName)

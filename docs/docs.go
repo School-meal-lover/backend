@@ -208,6 +208,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/upload/text": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "plain text로 한 주치 식단 데이터를 받아서 디비에 저장합니다. Bearer token 인증이 필요합니다.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "text"
+                ],
+                "summary": "텍스트로 식단 데이터 업로드",
+                "parameters": [
+                    {
+                        "description": "식단 텍스트 데이터",
+                        "name": "text",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Text processed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExcelProcessResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to process text",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -407,6 +464,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Bearer token 인증. 형식: \"Bearer gistsikdang\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
