@@ -112,7 +112,7 @@ const docTemplate = `{
         },
         "/restaurants/{name}": {
             "get": {
-                "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다.",
+                "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다. Restaurant1은 평일만(월~금, 5일), Restaurant2는 주말 포함(월~일, 7일) 조회됩니다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,7 +126,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "레스토랑 이름 (e.g., restaurant_1, restaurant_2)",
+                        "description": "레스토랑 이름 (RESTAURANT_1: 평일만, RESTAURANT_2: 주말 포함)",
                         "name": "name",
                         "in": "path",
                         "required": true

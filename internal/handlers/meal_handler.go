@@ -18,11 +18,11 @@ func NewMealHandler(mealService *services.MealService) *MealHandler {
 }
 
 // @Summary      특정 식당의 주간 식단 조회
-// @Description  경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다.
+// @Description  경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다. Restaurant1은 평일만(월~금, 5일), Restaurant2는 주말 포함(월~일, 7일) 조회됩니다.
 // @Tags         Meals
 // @Accept       json
 // @Produce      json
-// @Param        name path string true "레스토랑 이름 (e.g., restaurant_1, restaurant_2)" example:"restaurant_1 대소문자 관계없음"
+// @Param        name path string true "레스토랑 이름 (RESTAURANT_1: 평일만, RESTAURANT_2: 주말 포함)" example:"RESTAURANT_1 대소문자 관계없음"
 // @Param        date query string true "조회할 날짜 (YYYY-MM-DD 형식)" example:"2025-06-28"
 // @Success      200 {object} models.RestaurantMealsResponse "성공적으로 식단 정보 조회"
 // @Failure      400 {object} models.ErrorResponse "잘못된 요청 파라미터 (식당 이름 또는 날짜 형식 오류)"

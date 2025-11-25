@@ -60,7 +60,7 @@ func (s *ExcelService) ProcessExcelFile(filePath string) (*models.ExcelProcessRe
 	if err != nil {
 		return nil, fmt.Errorf("failed to get first non-empty sheet: %w", err)
 	}
-	dates, err := s.parser.BuildDatesFromExcel(f, sheetName)
+	dates, err := s.parser.BuildDatesFromExcel(f, sheetName, restaurantType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build dates: %w", err)
 	}
@@ -103,11 +103,17 @@ func (s *ExcelService) ProcessEnglishExcelFile(filePath string, weekID string) (
 	}
 	defer f.Close()
 
+	// weekID로부터 restaurant 정보 조회
+	restaurantType, err := s.mealRepo.GetRestaurantByWeekID(weekID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get restaurant by week ID: %w", err)
+	}
+
 	sheetName, err := s.parser.GetFirstNonEmptySheet(f)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get first non-empty sheet: %w", err)
 	}
-	dates, err := s.parser.BuildDatesFromExcel(f, sheetName)
+	dates, err := s.parser.BuildDatesFromExcel(f, sheetName, restaurantType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build dates: %w", err)
 	}

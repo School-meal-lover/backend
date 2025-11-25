@@ -147,24 +147,43 @@ func (r *MealRepository) InsertMenuItems(menuItems []models.MenuItem) error {
 	return tx.Commit()
 }
 
+// weekID로부터 restaurant 정보 조회
+func (r *MealRepository) GetRestaurantByWeekID(weekID string) (models.RestaurantType, error) {
+	var restaurant models.RestaurantType
+	query := `SELECT restaurant FROM weeks WHERE id = $1`
+	err := r.db.QueryRow(query, weekID).Scan(&restaurant)
+	if err != nil {
+		return "", fmt.Errorf("failed to get restaurant by week ID: %w", err)
+	}
+	return restaurant, nil
+}
+
 func (r *MealRepository) GetWeekInfo(restaurant models.RestaurantType, date string) (*models.WeekInfo, error) {
 	week := &models.WeekInfo{}
 	var startDate time.Time
-	query := `
+	
+	var daysInterval int
+	if restaurant == models.Restaurant1 {
+		daysInterval = 4 
+	} else {
+		daysInterval = 6
+	}
+	
+	query := fmt.Sprintf(`
 		SELECT id, start_date
         FROM weeks 
         WHERE restaurant = $1 
         AND $2 >= start_date 
-        AND $2 <= start_date + INTERVAL '6 days'
+        AND $2 <= start_date + INTERVAL '%d days'
         ORDER BY start_date DESC
-        LIMIT 1`
+        LIMIT 1`, daysInterval)
 
 	err := r.db.QueryRow(query, restaurant, date).Scan(&week.ID, &startDate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get week by date: %w", err)
 	}
 	week.StartDate = startDate.Format("2006-01-02")
-	week.EndDate = startDate.AddDate(0, 0, 6).Format("2006-01-02")
+	week.EndDate = startDate.AddDate(0, 0, daysInterval).Format("2006-01-02")
 
 	return week, nil
 }
