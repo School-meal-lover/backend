@@ -102,8 +102,12 @@ func (p *Parser) GetFirstNonEmptySheet(f *ExcelFile) (string, error) {
 }
 
 // 엑셀에서 날짜 정보 구성
-func (p *Parser) BuildDatesFromExcel(f *ExcelFile, sheetName string) ([]models.DateInfo, error) {
+func (p *Parser) BuildDatesFromExcel(f *ExcelFile, sheetName string, restaurantType models.RestaurantType) ([]models.DateInfo, error) {
+	// restaurant1은 평일만(월~금), restaurant2는 주말 포함(월~일)
 	cols := []string{"D", "E", "F", "G", "H"}
+	if restaurantType == models.Restaurant2 {
+		cols = append(cols, "I", "J") // 주말 추가
+	}
 	var dates []models.DateInfo
 
 	for _, col := range cols {
