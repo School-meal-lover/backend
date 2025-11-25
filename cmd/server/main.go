@@ -25,7 +25,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Bearer token 인증. 형식: "Bearer gistsikdang"
+// @description 토큰 인증. 토큰은 환경변수 BEARER_TOKEN에서 설정.
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -55,8 +55,9 @@ func main() {
 	// CORS 미들웨어
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

@@ -1,16 +1,31 @@
 package middleware
 
 import (
+	"errors"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-const BearerToken = "gistsikdang"
+// GetBearerToken은 환경변수에서 Bearer token을 가져옵니다
+func GetBearerToken() (string, error) {
+	token := os.Getenv("BEARER_TOKEN")
+	if token == "" {
+		return "", errors.New("BEARER_TOKEN 환경변수가 비어있습니다")
+	}
+	return token, nil
+}
 
 // BearerTokenAuth 미들웨어는 Bearer token을 검증합니다
 func BearerTokenAuth() gin.HandlerFunc {
+	expectedToken, err := GetBearerToken()
+	if err != nil {
+		log.Fatalf("토큰을 받아오는데 실패했습니다: %v", err)
+	}
+	
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -22,20 +37,11 @@ func BearerTokenAuth() gin.HandlerFunc {
 			return
 		}
 
-		// "Bearer " 접두사 제거
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		if token == authHeader {
-			// Bearer 접두사가 없었음
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"error":   "Invalid authorization format. Use 'Bearer <token>'",
-			})
-			c.Abort()
-			return
-		}
+		token = strings.TrimSpace(token)
 
 		// 토큰 검증
-		if token != BearerToken {
+		if token != expectedToken {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
 				"error":   "Invalid token",

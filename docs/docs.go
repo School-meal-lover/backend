@@ -468,7 +468,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Bearer token 인증. 형식: \"Bearer gistsikdang\"",
+            "description": "토큰 인증. Swagger UI에서 토큰만 입력하세요. 토큰은 환경변수 BEARER_TOKEN에서 설정.",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -479,9 +479,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "api.grrrr.me",
+	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
-	Schemes:          []string{"https"},
+	Schemes:          []string{"http", "https"},
 	Title:            "Grrrrr API",
 	Description:      "The server for Grrrrr application.",
 	InfoInstanceName: "swagger",
