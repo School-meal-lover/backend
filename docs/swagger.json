@@ -1,409 +1,434 @@
 {
-    "schemes": [
-        "https"
-    ],
-    "swagger": "2.0",
-    "info": {
-        "description": "The server for Grrrrr application.",
-        "title": "Grrrrr API",
-        "contact": {},
-        "version": "1.0"
-    },
-    "host": "api.grrrr.me",
-    "basePath": "/api/v1",
-    "paths": {
-        "/images/current": {
-            "get": {
-                "description": "현재 저장된 이미지 이름을 조회합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Images"
-                ],
-                "summary": "현재 이미지 이름 조회",
-                "parameters": [
-                    {
-                        "enum": [
-                            1,
-                            2,
-                            3
-                        ],
-                        "type": "integer",
-                        "description": "레스토랑 번호",
-                        "name": "restaurant_name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "성공적으로 현재 이미지 이름 조회",
-                        "schema": {
-                            "$ref": "#/definitions/models.ImageInfoResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "서버 내부 오류 발생",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
+  "schemes": ["http", "https"],
+  "swagger": "2.0",
+  "info": {
+    "description": "The server for Grrrrr application.",
+    "title": "Grrrrr API",
+    "contact": {},
+    "version": "1.0"
+  },
+  "host": "localhost:8080",
+  "basePath": "/api/v1",
+  "paths": {
+    "/images/current": {
+      "get": {
+        "description": "현재 저장된 이미지 이름을 조회합니다.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Images"],
+        "summary": "현재 이미지 이름 조회",
+        "parameters": [
+          {
+            "enum": [1, 2, 3],
+            "type": "integer",
+            "description": "레스토랑 번호",
+            "name": "restaurant_name",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공적으로 현재 이미지 이름 조회",
+            "schema": {
+              "$ref": "#/definitions/models.ImageInfoResponse"
             }
-        },
-        "/images/upload": {
-            "post": {
-                "description": "이미지 이름을 업로드합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Images"
-                ],
-                "summary": "이미지 이름 업로드",
-                "parameters": [
-                    {
-                        "enum": [
-                            1,
-                            2,
-                            3
-                        ],
-                        "type": "integer",
-                        "description": "레스토랑 번호",
-                        "name": "restaurant_name",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "업로드할 이미지 이름",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ImageUploadRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "성공적으로 이미지 이름 업로드",
-                        "schema": {
-                            "$ref": "#/definitions/models.ImageInfoResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "서버 내부 오류 발생",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
+          },
+          "500": {
+            "description": "서버 내부 오류 발생",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
             }
-        },
-        "/restaurants/{name}": {
-            "get": {
-                "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다. Restaurant1은 평일만(월~금, 5일), Restaurant2는 주말 포함(월~일, 7일) 조회됩니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Meals"
-                ],
-                "summary": "특정 식당의 주간 식단 조회",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "레스토랑 이름 (RESTAURANT_1: 평일만, RESTAURANT_2: 주말 포함)",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "조회할 날짜 (YYYY-MM-DD 형식)",
-                        "name": "date",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "성공적으로 식단 정보 조회",
-                        "schema": {
-                            "$ref": "#/definitions/models.RestaurantMealsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "잘못된 요청 파라미터 (식당 이름 또는 날짜 형식 오류)",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "해당 식당 또는 해당 날짜의 식단 정보를 찾을 수 없음",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "서버 내부 오류 발생",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/upload/excel": {
-            "post": {
-                "description": "파일을 업로드 해서 식단 데이터를 디비에 저장한다.",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "tags": [
-                    "excel"
-                ],
-                "summary": "엑셀 처리 API",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "한국어 엑셀 파일",
-                        "name": "excel_ko",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "영어 엑셀 파일",
-                        "name": "excel_en",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Excel file processed successfully",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.DualExcelProcessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to process Excel file",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "definitions": {
-        "handlers.DualExcelProcessResponse": {
-            "type": "object",
-            "properties": {
-                "result_en": {
-                    "$ref": "#/definitions/models.ExcelProcessResult"
-                },
-                "result_ko": {
-                    "$ref": "#/definitions/models.ExcelProcessResult"
-                },
-                "success": {
-                    "type": "boolean"
-                }
+    "/images/upload": {
+      "post": {
+        "description": "이미지 이름을 업로드합니다.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Images"],
+        "summary": "이미지 이름 업로드",
+        "parameters": [
+          {
+            "enum": [1, 2, 3],
+            "type": "integer",
+            "description": "레스토랑 번호",
+            "name": "restaurant_name",
+            "in": "query",
+            "required": true
+          },
+          {
+            "description": "업로드할 이미지 이름",
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/models.ImageUploadRequest"
             }
-        },
-        "models.DayMeals": {
-            "type": "object",
-            "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "day_of_week": {
-                    "type": "string"
-                },
-                "meals": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/models.MealInfo"
-                    }
-                }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공적으로 이미지 이름 업로드",
+            "schema": {
+              "$ref": "#/definitions/models.ImageInfoResponse"
             }
-        },
-        "models.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Failed to process Excel file: file not found"
-                },
-                "success": {
-                    "type": "boolean",
-                    "example": false
-                }
+          },
+          "500": {
+            "description": "서버 내부 오류 발생",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
             }
-        },
-        "models.ExcelProcessResult": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "restaurant_type": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                },
-                "total_meals": {
-                    "type": "integer"
-                },
-                "total_menu_items": {
-                    "type": "integer"
-                },
-                "week_id": {
-                    "type": "string"
-                },
-                "week_start_date": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ImageInfoResponse": {
-            "type": "object",
-            "properties": {
-                "image_date": {
-                    "type": "string"
-                },
-                "image_name": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.ImageUploadRequest": {
-            "type": "object",
-            "required": [
-                "image_name"
-            ],
-            "properties": {
-                "image_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.MealInfo": {
-            "type": "object",
-            "properties": {
-                "meal_id": {
-                    "type": "string"
-                },
-                "meal_type": {
-                    "type": "string"
-                },
-                "menu_items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MenuItemResponse"
-                    }
-                }
-            }
-        },
-        "models.MealsSummary": {
-            "type": "object",
-            "properties": {
-                "total_days": {
-                    "type": "integer"
-                },
-                "total_meals": {
-                    "type": "integer"
-                },
-                "total_menu_items": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.MenuItemResponse": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "name_en": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                }
-            }
-        },
-        "models.RestaurantMealsData": {
-            "type": "object",
-            "properties": {
-                "meals_by_day": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.DayMeals"
-                    }
-                },
-                "restaurant": {
-                    "type": "string"
-                },
-                "summary": {
-                    "$ref": "#/definitions/models.MealsSummary"
-                },
-                "week": {
-                    "$ref": "#/definitions/models.WeekInfo"
-                }
-            }
-        },
-        "models.RestaurantMealsResponse": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "data": {
-                    "$ref": "#/definitions/models.RestaurantMealsData"
-                },
-                "error": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.WeekInfo": {
-            "type": "object",
-            "properties": {
-                "end_date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "start_date": {
-                    "type": "string"
-                }
-            }
+          }
         }
+      }
+    },
+    "/restaurants/{name}": {
+      "get": {
+        "description": "경로 파라미터로 받은 식당 이름과 쿼리로 받은 날짜를 기준으로 주간 식단을 조회합니다. Restaurant1은 평일만(월~금, 5일), Restaurant2는 주말 포함(월~일, 7일) 조회됩니다.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Meals"],
+        "summary": "특정 식당의 주간 식단 조회",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "레스토랑 이름 (RESTAURANT_1: 평일만, RESTAURANT_2: 주말 포함)",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "조회할 날짜 (YYYY-MM-DD 형식)",
+            "name": "date",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공적으로 식단 정보 조회",
+            "schema": {
+              "$ref": "#/definitions/models.RestaurantMealsResponse"
+            }
+          },
+          "400": {
+            "description": "잘못된 요청 파라미터 (식당 이름 또는 날짜 형식 오류)",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "해당 식당 또는 해당 날짜의 식단 정보를 찾을 수 없음",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류 발생",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/upload/excel": {
+      "post": {
+        "description": "파일을 업로드 해서 식단 데이터를 디비에 저장한다.",
+        "consumes": ["multipart/form-data"],
+        "tags": ["excel"],
+        "summary": "엑셀 처리 API",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "한국어 엑셀 파일",
+            "name": "excel_ko",
+            "in": "formData",
+            "required": true
+          },
+          {
+            "type": "file",
+            "description": "영어 엑셀 파일",
+            "name": "excel_en",
+            "in": "formData",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel file processed successfully",
+            "schema": {
+              "$ref": "#/definitions/handlers.DualExcelProcessResponse"
+            }
+          },
+          "500": {
+            "description": "Failed to process Excel file",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/upload/text": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "plain text로 한 주치 식단 데이터를 받아서 디비에 저장합니다. Bearer token 인증이 필요합니다.",
+        "consumes": ["text/plain"],
+        "produces": ["application/json"],
+        "tags": ["text"],
+        "summary": "텍스트로 식단 데이터 업로드",
+        "parameters": [
+          {
+            "description": "식단 텍스트 데이터",
+            "name": "text",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Text processed successfully",
+            "schema": {
+              "$ref": "#/definitions/models.ExcelProcessResult"
+            }
+          },
+          "400": {
+            "description": "Invalid request body or format",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Failed to process text",
+            "schema": {
+              "$ref": "#/definitions/models.ErrorResponse"
+            }
+          }
+        }
+      }
     }
+  },
+  "definitions": {
+    "handlers.DualExcelProcessResponse": {
+      "type": "object",
+      "properties": {
+        "result_en": {
+          "$ref": "#/definitions/models.ExcelProcessResult"
+        },
+        "result_ko": {
+          "$ref": "#/definitions/models.ExcelProcessResult"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "models.DayMeals": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "day_of_week": {
+          "type": "string"
+        },
+        "meals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/models.MealInfo"
+          }
+        }
+      }
+    },
+    "models.ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "example": "Failed to process Excel file: file not found"
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        }
+      }
+    },
+    "models.ExcelProcessResult": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "restaurant_type": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "total_meals": {
+          "type": "integer"
+        },
+        "total_menu_items": {
+          "type": "integer"
+        },
+        "week_id": {
+          "type": "string"
+        },
+        "week_start_date": {
+          "type": "string"
+        }
+      }
+    },
+    "models.ImageInfoResponse": {
+      "type": "object",
+      "properties": {
+        "image_date": {
+          "type": "string"
+        },
+        "image_name": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "models.ImageUploadRequest": {
+      "type": "object",
+      "required": ["image_name"],
+      "properties": {
+        "image_name": {
+          "type": "string"
+        }
+      }
+    },
+    "models.MealInfo": {
+      "type": "object",
+      "properties": {
+        "meal_id": {
+          "type": "string"
+        },
+        "meal_type": {
+          "type": "string"
+        },
+        "menu_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/models.MenuItemResponse"
+          }
+        }
+      }
+    },
+    "models.MealsSummary": {
+      "type": "object",
+      "properties": {
+        "total_days": {
+          "type": "integer"
+        },
+        "total_meals": {
+          "type": "integer"
+        },
+        "total_menu_items": {
+          "type": "integer"
+        }
+      }
+    },
+    "models.MenuItemResponse": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "name_en": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        }
+      }
+    },
+    "models.RestaurantMealsData": {
+      "type": "object",
+      "properties": {
+        "meals_by_day": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/models.DayMeals"
+          }
+        },
+        "restaurant": {
+          "type": "string"
+        },
+        "summary": {
+          "$ref": "#/definitions/models.MealsSummary"
+        },
+        "week": {
+          "$ref": "#/definitions/models.WeekInfo"
+        }
+      }
+    },
+    "models.RestaurantMealsResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/models.RestaurantMealsData"
+        },
+        "error": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "models.WeekInfo": {
+      "type": "object",
+      "properties": {
+        "end_date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "description": "토큰 인증. Swagger UI에서 토큰만 입력하세요. 토큰은 환경변수 BEARER_TOKEN에서 설정.",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
 }

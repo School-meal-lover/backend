@@ -208,6 +208,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/upload/text": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "plain text로 한 주치 식단 데이터를 받아서 디비에 저장합니다. Bearer token 인증이 필요합니다.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "text"
+                ],
+                "summary": "텍스트로 식단 데이터 업로드",
+                "parameters": [
+                    {
+                        "description": "식단 텍스트 데이터",
+                        "name": "text",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Text processed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExcelProcessResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to process text",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -408,15 +465,23 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "토큰 인증. Swagger UI에서 토큰만 입력하세요. 토큰은 환경변수 BEARER_TOKEN에서 설정.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "api.grrrr.me",
+	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
-	Schemes:          []string{"https"},
+	Schemes:          []string{"http", "https"},
 	Title:            "Grrrrr API",
 	Description:      "The server for Grrrrr application.",
 	InfoInstanceName: "swagger",
