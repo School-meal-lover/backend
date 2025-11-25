@@ -7,7 +7,7 @@
     "contact": {},
     "version": "1.0"
   },
-  "host": "localhost:8080",
+  "host": "api.grrrr.me",
   "basePath": "/api/v1",
   "paths": {
     "/images/current": {
