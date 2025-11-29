@@ -1,6 +1,7 @@
 package services
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/School-meal-lover/backend/internal/models"
@@ -68,5 +69,47 @@ func (s *MealService) GetRestaurantWeekMeals(restaurantNameParam string, date st
 	return &models.RestaurantMealsResponse{
 		Success: true,
 		Data:    response,
+	}, nil
+}
+
+func (s *MealService) GetIndMenuSold(mealID string) (models.IndMenuSoldResponse, error) {
+	result, err := s.mealRepo.GetIndMenuSold(mealID)
+	if err == sql.ErrNoRows {
+		result, err = s.mealRepo.UpsertIndMenuSold(mealID, nil)
+		if err != nil {
+			return models.IndMenuSoldResponse{
+				Success: false,
+				Error:   "Failed to create IndMenuSold record",
+				Code:    "IND_MENU_SOLD_CREATION_FAILED",
+			}, nil
+		}
+	}
+	if err != nil {
+		return models.IndMenuSoldResponse{
+			Success: false,
+			Error:   "Failed to retrieve IndMenuSold record",
+			Code:    "IND_MENU_SOLD_RETRIEVAL_FAILED",
+		}, nil
+	}
+
+	return models.IndMenuSoldResponse{
+		Success: true,
+		Data:    &result,
+	}, nil
+}
+
+func (s *MealService) MarkIndMenuSoldOut(mealID string, soldOutAt *time.Time) (models.IndMenuSoldResponse, error) {
+	result, err := s.mealRepo.UpsertIndMenuSold(mealID, soldOutAt)
+	if err != nil {
+		return models.IndMenuSoldResponse{
+			Success: false,
+			Error:   "Failed to upsert IndMenuSold record",
+			Code:    "IND_MENU_SOLD_UPSERT_FAILED",
+		}, nil
+	}
+
+	return models.IndMenuSoldResponse{
+		Success: true,
+		Data:    &result,
 	}, nil
 }
