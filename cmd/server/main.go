@@ -71,11 +71,13 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 		api.GET("/restaurants/:name", mealHandler.GetRestaurantMeals)
+		api.GET("/meals/:meal_id/ind_menu_sold", mealHandler.GetIndMenuSold)
 
 		api.POST("/upload/excel", excelHandler.UploadAndProcessExcel)
 
 		// Bearer token 인증이 필요한 엔드포인트
 		api.POST("/upload/text", middleware.BearerTokenAuth(), textHandler.UploadText)
+		api.PUT("/meals/:meal_id/ind_menu_sold", middleware.BearerTokenAuth(), mealHandler.UpdateIndMenuSold)
 
 		api.POST("/images/upload", imageHandler.UploadImageName)
 		api.GET("/images/current", imageHandler.GetCurrentImageName)

@@ -27,6 +27,13 @@ type RestaurantMealsResponse struct {
 	Code    string               `json:"code,omitempty"`
 }
 
+type IndMenuSoldResponse struct {
+	Success bool         `json:"success"`
+	Data    *IndMenuSold `json:"data,omitempty"`
+	Error   string       `json:"error,omitempty"`
+	Code    string       `json:"code,omitempty"`
+}
+
 type ErrorResponse struct {
 	Success bool   `json:"success" example:"false"`
 	Error   string `json:"error" example:"Failed to process Excel file: file not found"`

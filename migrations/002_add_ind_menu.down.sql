@@ -1,0 +1,1 @@
+DROP TABLE "ind_menu_sold"
