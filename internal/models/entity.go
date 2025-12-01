@@ -3,14 +3,16 @@ package models
 import "time"
 
 type RestaurantType string
+
 const (
 	Restaurant1 RestaurantType = "RESTAURANT_1"
 	Restaurant2 RestaurantType = "RESTAURANT_2"
 )
 
+// database 모델 구조체
 type Week struct {
-	ID         string         `json:"id" db:"id"`
-	StartDate  time.Time      `json:"start_date" db:"start_date"`
+	ID             string         `json:"id" db:"id"`
+	StartDate      time.Time      `json:"start_date" db:"start_date"`
 	RestaurantType RestaurantType `json:"restaurant" db:"restaurants"`
 }
 
@@ -31,6 +33,12 @@ type MenuItem struct {
 	Name     string  `json:"name" db:"name"`
 	NameEn   string  `json:"name_en" db:"name_en"`
 	Price    float64 `json:"price" db:"price"`
+}
+
+type IndMenuSold struct {
+	ID        string     `json:"id" db:"id"`
+	MealID    string     `json:"meal_id" db:"meals_id"`
+	SoldOutAt *time.Time `json:"sold_out_at" db:"sold_out_at"`
 }
 
 // 엑셀 파싱용 구조체

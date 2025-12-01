@@ -39,9 +39,9 @@ func (r *MealRepository) InsertWeek(startDate time.Time, restaurant models.Resta
 func (r *MealRepository) FindOrCreateWeek(startDate time.Time, restaurant models.RestaurantType) (string, error) {
 	var weekID string
 	findQuery := `SELECT id FROM weeks WHERE start_date = $1 AND restaurant = $2`
-	
+
 	err := r.db.QueryRow(findQuery, startDate, restaurant).Scan(&weekID)
-	
+
 	if err == nil {
 		log.Printf("Found existing week ID: %s for start date %s", weekID, startDate.Format("2006-01-02"))
 		return weekID, nil
@@ -52,7 +52,6 @@ func (r *MealRepository) FindOrCreateWeek(startDate time.Time, restaurant models
 	}
 	return "", fmt.Errorf("error while trying to find week: %w", err)
 }
-
 
 // 식사 정보 삽입
 func (r *MealRepository) InsertMeal(meal *models.Meal) (string, error) {
@@ -77,20 +76,20 @@ func (r *MealRepository) InsertMeal(meal *models.Meal) (string, error) {
 	return insertedID, nil
 }
 func (r *MealRepository) FindOrCreateMeal(meal *models.Meal) (string, error) {
-    var mealID string
-    findQuery := `SELECT id FROM meals WHERE weeks_id = $1 AND date = $2 AND meal_type = $3`
+	var mealID string
+	findQuery := `SELECT id FROM meals WHERE weeks_id = $1 AND date = $2 AND meal_type = $3`
 
-    err := r.db.QueryRow(findQuery, meal.WeekID, meal.Date, meal.MealType).Scan(&mealID)
+	err := r.db.QueryRow(findQuery, meal.WeekID, meal.Date, meal.MealType).Scan(&mealID)
 
-    if err == nil {
-        return mealID, nil
-    }
+	if err == nil {
+		return mealID, nil
+	}
 
-    if err == sql.ErrNoRows {
-        return r.InsertMeal(meal)
-    }
+	if err == sql.ErrNoRows {
+		return r.InsertMeal(meal)
+	}
 
-    return "", fmt.Errorf("error finding or creating meal: %w", err)
+	return "", fmt.Errorf("error finding or creating meal: %w", err)
 }
 
 func (r *MealRepository) HandleRepositoryError(err error, notFoundCode, notFoundMessage string) (*models.RestaurantMealsResponse, error) {
@@ -161,14 +160,14 @@ func (r *MealRepository) GetRestaurantByWeekID(weekID string) (models.Restaurant
 func (r *MealRepository) GetWeekInfo(restaurant models.RestaurantType, date string) (*models.WeekInfo, error) {
 	week := &models.WeekInfo{}
 	var startDate time.Time
-	
+
 	var daysInterval int
 	if restaurant == models.Restaurant1 {
-		daysInterval = 4 
+		daysInterval = 4
 	} else {
 		daysInterval = 6
 	}
-	
+
 	query := fmt.Sprintf(`
 		SELECT id, start_date
         FROM weeks 
@@ -342,4 +341,33 @@ func (r *MealRepository) UpdateMenuItemsEnglishNameBatch(items []models.MenuItem
 
 	_, err := r.db.Exec(query, args...)
 	return err
+}
+
+func (r *MealRepository) GetIndMenuSold(mealID string) (models.IndMenuSold, error) {
+	var id string
+	var soldOutAt *time.Time
+	query := `
+		SELECT id, sold_out_at FROM ind_menu_sold 
+		WHERE meals_id = $1
+		LIMIT 1
+	`
+	err := r.db.QueryRow(query, mealID).Scan(&id, &soldOutAt)
+	return models.IndMenuSold{ID: id, MealID: mealID, SoldOutAt: soldOutAt}, err
+}
+
+func (r *MealRepository) UpsertIndMenuSold(mealID string, soldOutAt *time.Time) (models.IndMenuSold, error) {
+	query := `
+		INSERT INTO ind_menu_sold (id, meals_id, sold_out_at)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (meals_id) DO UPDATE SET sold_out_at = EXCLUDED.sold_out_at
+		RETURNING id, meals_id, sold_out_at
+	`
+	id := uuid.New().String()
+	var storedID, storedMealID string
+	var storedSoldOutAt *time.Time
+	err := r.db.QueryRow(query, id, mealID, soldOutAt).Scan(&storedID, &storedMealID, &storedSoldOutAt)
+	if err != nil {
+		return models.IndMenuSold{}, err
+	}
+	return models.IndMenuSold{ID: storedID, MealID: storedMealID, SoldOutAt: storedSoldOutAt}, err
 }
