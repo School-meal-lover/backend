@@ -10,6 +10,19 @@ type ExcelProcessResult struct {
 	Message        string `json:"message"`
 }
 
+type TextUploadRequest struct {
+	WeekStartDate string `json:"week_start_date"`
+	Meals         []struct {
+		Date      string `json:"date"`
+		DayOfWeek string `json:"day_of_week"`
+		MealType  string `json:"meal_type"`
+		MenuItems []struct {
+			Name     string `json:"name"`
+			Category string `json:"category"`
+		} `json:"menu_items"`
+	} `json:"meals"`
+}
+
 type ImageUploadRequest struct {
 	ImageName string `json:"image_name" binding:"required"`
 }
