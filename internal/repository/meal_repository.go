@@ -360,8 +360,14 @@ func (r *MealRepository) UpsertIndMenuSold(mealID string, soldOutAt *time.Time) 
 		INSERT INTO ind_menu_sold (id, meals_id, sold_out_at)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (meals_id) DO UPDATE SET sold_out_at = EXCLUDED.sold_out_at
+		RETURNING id, meals_id, sold_out_at
 	`
 	id := uuid.New().String()
-	_, err := r.db.Exec(query, id, mealID, soldOutAt)
-	return models.IndMenuSold{ID: id, MealID: mealID, SoldOutAt: soldOutAt}, err
+	var storedID, storedMealID string
+	var storedSoldOutAt *time.Time
+	err := r.db.QueryRow(query, id, mealID, soldOutAt).Scan(&storedID, &storedMealID, &storedSoldOutAt)
+	if err != nil {
+		return models.IndMenuSold{}, err
+	}
+	return models.IndMenuSold{ID: storedID, MealID: storedMealID, SoldOutAt: storedSoldOutAt}, err
 }
